@@ -11,17 +11,40 @@ class Users(models.Model):
 # Profile
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    bio = models.TextField(max_length= 500, default="")
-    full_name = models.CharField(max_length= 50, default="")
+    avatar = models.ImageField(upload_to='user/avatar', default="", blank=True)
+    bio = models.TextField(max_length= 500, blank = True, default="")
+    full_name = models.CharField(max_length= 50, blank = True, default="")
     phone_number = models.IntegerField( null=True, blank= True)
     last_updated = models.DateTimeField(User, auto_now=True)
     def __str__(self):
         return self.user.email
+
 def create_profile(sender,instance, created, **kwargs):
     if created:
         user_profile = Profile(user= instance)
         user_profile.save()
 post_save.connect(create_profile, sender= User)    
+
+class Image(models.Model):
+    caption = models.CharField(max_length=20)
+    photo   = models.ImageField(upload_to='user/images')
+    def __str__(self):
+        return (f'{self.caption}', f'{self.photo}')
+# Posts
+class Post(models.Model):
+    user = models.ForeignKey(User, related_name="posts", on_delete=models.DO_NOTHING)
+    body = models.CharField(max_length=200)
+    created_at = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return (f"{self.user}"
+                f"({self.created_at})"
+                f"{self.body}")
+# Feedbacks
+class Feedback(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.DO_NOTHING)
+    comment= models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, related_name="feedbacks", on_delete=models.DO_NOTHING)
 # Products 
 class Products(models.Model):
     product_id = models.AutoField

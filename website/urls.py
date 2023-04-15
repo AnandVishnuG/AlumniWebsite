@@ -24,4 +24,4 @@ urlpatterns = [
     path('', include("main.urls")),
     path('auth/',include("authentication.urls")),
     path('__debug__/', include(debug_toolbar.urls))
-]+ static(settings.MEDIA_URL, document_route= settings.MEDIA_ROUTE)
+]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

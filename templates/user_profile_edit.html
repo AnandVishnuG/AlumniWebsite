@@ -1,24 +1,44 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Profile{% endblock title %}
-{% block hero %}{% endblock hero %} 
+{% block hero %}
+    {% for message in messages %}
+        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+            <strong> </strong>{{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+        </div>
+    {% endfor %}
+{% endblock hero %} 
 {% block content %}
 <section style="padding-top: 100px;">
-        <nav aria-label="Page navigation example">
+    <form method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+    
+        <nav aria-label="Page navigation example">  
           <ul id="TogglePagination" class="pagination">
-            <li class="page-item active"><a class="page-link" href="/user_profile/{{request.user.id}}"><i class="bi bi-eye"></i></a></li>
-            <li class="page-item"><a class="page-link" href="/edit_profile/{{request.user.id}}"><i class="bi bi-pen"></i></a></li>
+            <li class="page-item"><a class="page-link" href="/user_profile/{{request.user.id}}"><i class="bi bi-eye"></i></a></li>
+            <li class="page-item active"><a class="page-link" href="/edit_profile/{{request.user.id}}"><i class="bi bi-pen"></i></a></li>
+            <button type="submit" class="ms-auto btn btn-link" ><i class="bi bi-save"></i></button>
           </ul>
+          
         </nav>
       <div class="row">
         <div class="col-lg-4">
           <div class="card mb-4">
-            <div class="card-body text-center">
-              {% if profile.avatar %}
-              <img src={{profile.avatar.url}} alt="avatar" class="rounded-circle img-fluid" style="height:150px;" >
-              {% else %}
-              <img src= {% static 'assets\img\profile\default-profile-photo.jpg' %} alt="avatar" class="rounded-circle img-fluid" style="height:150px;" >
-              {% endif %}
+            <div class="card-body text-center position-relative">
+                {% if profile.avatar %}
+                <img src={{profile.avatar.url}} alt="avatar" class="rounded-circle img-fluid" style="height:150px;" >
+                {% else %}
+                <img src= {% static 'assets\img\profile\default-profile-photo.jpg' %} alt="avatar" class="rounded-circle img-fluid" style="height:150px;" >
+                {% endif %}
+                
+                <div class="position-absolute" style="top: 150px; right:30px;">
+                    <!--button class="btn btn-light rounded-circle">
+                        <i class="bi bi-upload"></i>
+                    </button-->
+                    <label for="avatar" class="btn btn-light rounded-circle"><i class="bi bi-upload"></i></label>
+                    <input type="file" id="avatar" name="avatar" accept="image/*" hidden></input>
+                </div>
               <h5 class="my-3">{{profile.user.username}}</h5>
               <p class="text-muted mb-1">Full Stack Developer</p>
               <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
@@ -56,19 +76,19 @@
             <div class="card-body">
               <div class="row">
                 <div class="col-sm-3">
-                  <p class="mb-0">Full Name</p>
+                  <label for="fullName" class="mb-0">Full Name</label>
                 </div>
                 <div class="col-sm-9">
-                  <p class="text-muted mb-0">{{profile.user.first_name}} {{profile.user.last_name}}</p>
+                  <input type="text" id="fullName" name="fullName" value="{{profile.user.first_name}} {{profile.user.last_name}}" class="mb-0"> </input>
                 </div>
               </div>
               <hr>
               <div class="row">
                 <div class="col-sm-3">
-                  <p class="mb-0">Email</p>
+                  <label for="email" class="mb-0">Email</label>
                 </div>
                 <div class="col-sm-9">
-                  <p class="text-muted mb-0">{{profile.user.email}}</p>
+                  <input type="text" id="email" name="email" value="{{profile.user.email}}" class="mb-0"></input>
                 </div>
               </div>
               <hr>
@@ -171,9 +191,6 @@
         </div>
       </div>
     </div>
-    <form method="POST"> {% csrf_token %}
-    
-    </form>
-    
+</form>
   </section>
 {% endblock content %}

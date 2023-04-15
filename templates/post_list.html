@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block hero %}{% endblock hero %}
+{% block content %}
+
+    <div class = "container" style="padding-top:100px;">
+        {% for post in post_list %}
+        <div class="row justify-content-center mt-3">
+            <div class=" col-md-5 col-sm-12 border-bottom position-relative">
+            <p><strong>{{post.user.username}}</strong> {{post.created_at}}</p>
+            <p>{{post.body}}</p>
+            <a class="stretched-link" href="/posts/{{post.pk}}"></a>
+            </div>
+        </div>
+        <!--div class="card col-md-5 col-sm-12 w-100" style="max-height:200px;">
+            <div class="row g-0">
+              <div class="col-md-4">
+                {% if profile.avatar %}
+                <img src="{{profile.avatar.url}}" 
+                     class="img-fluid rounded-start" alt="Profile picture" style="height:200px;">
+                {% else %}     
+                <img src="{% static 'assets/img/profile/default-profile-photo.jpg' %}" 
+                     class="img-fluid rounded-start" alt="Profile picture"style="height:200px;">
+                {% endif %}
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">{{profile.user.username}}</h5>
+                  <p class="card-text">{{profile.user.email}}</p>
+                  <br/><br/>
+                  <p class="card-text"><small class="text-muted">Last updated {{profile.last_updated}}</small></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <br/><br/-->
+
+        {% endfor %}
+        {% if request.user.is_authenticated %}
+        <div class="row justify-content-center mt-3">
+            <div class=" col-md-5 col-sm-12 border-bottom">
+                <h5>Add a post!</h5>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-3">
+            <div class=" col-md-5 col-sm-12 border-bottom">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{form}}
+                    <div class="d-grid gap-2">
+                        <button class ="btn mt-3 mb-5" style="background: #e43c5c;"> Submit! </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock content %}
