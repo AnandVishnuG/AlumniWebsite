@@ -74,4 +74,11 @@ class PostDetailView(View):
         post = Post.objects.get(pk=pk)
         form = FeedbackForm()
         return render(request, 'post_detail.html',{'post':post, 'form':form})
-        
+# Products/Services
+class ServiceListView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'products.html',{}) 
+    
+class CartListView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "cart.html", {})
