@@ -74,6 +74,18 @@ class PostDetailView(View):
         post = Post.objects.get(pk=pk)
         form = FeedbackForm()
         return render(request, 'post_detail.html',{'post':post, 'form':form})
+class PostCreateView(View):
+   def get(self, request, *args, **kwargs):
+        form = PostForm(request.POST) 
+        return render(request, 'add_post.html', {'form':form})
+   def post(self, request, *args, **kwargs):
+        form = PostForm(request.POST)
+        if form.is_valid():
+            new_post = form.save(commit=False)
+            new_post.user = request.user
+            new_post.save()
+        return render(request, 'add_post.html', {'form':form})
+ 
 # Products/Services
 class ServiceListView(View):
     def get(self, request, *args, **kwargs):

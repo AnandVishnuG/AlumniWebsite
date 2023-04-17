@@ -9,6 +9,8 @@ django-debug-toolbar = "*"
 django-six = "*"
 six = "*"
 pillow = "*"
+django-tinymce = "*"
+django-ckeditor = "*"
 
 [dev-packages]
 

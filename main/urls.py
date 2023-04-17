@@ -10,4 +10,7 @@ urlpatterns = [
     path("edit_profile/<int:pk>", views.editUserProfile, name="editUserProfile"),
     path("posts/",views.PostListView.as_view(), name="post-list"),
     path("posts/<int:pk>",views.PostDetailView.as_view(), name="post-detail"),
+    path("add_post/",views.PostCreateView.as_view(), name="post-create"),
+    path("services/",views.ServiceListView.as_view(), name="service-list"),
+    path("cart/",views.CartListView.as_view(), name="cart-list"),
 ]

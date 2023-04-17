@@ -1,20 +1,19 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
+from ckeditor.fields import RichTextField
 
-# Create your models here.
-class Users(models.Model):
-    name = models.CharField(max_length= 50)
-    email = models.EmailField()
-    desc = models.TextField(max_length= 500)
-    phonenumber= models.IntegerField()
 # Profile
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     avatar = models.ImageField(upload_to='user/avatar', default="", blank=True)
     bio = models.TextField(max_length= 500, blank = True, default="")
-    full_name = models.CharField(max_length= 50, blank = True, default="")
-    phone_number = models.IntegerField( null=True, blank= True)
+    career_position = models.CharField(max_length=50, null=True, blank= True, default="Student")
+    state = models.CharField(max_length=20, blank= True, null=True)
+    country = models.CharField(max_length=20, blank= True, null=True)
+    linkedin_url = models.CharField(max_length=255, blank= True, null=True)
+    instagram_url = models.CharField(max_length=255, blank= True, null=True)
+    twitter_url = models.CharField(max_length=255, blank= True, null=True)
     last_updated = models.DateTimeField(User, auto_now=True)
     def __str__(self):
         return self.user.email
@@ -33,12 +32,13 @@ class Image(models.Model):
 # Posts
 class Post(models.Model):
     user = models.ForeignKey(User, related_name="posts", on_delete=models.DO_NOTHING)
-    body = models.CharField(max_length=200)
+    body = RichTextField(blank=True, null=True)
+    synopsis = models.CharField(max_length=100, default="Place holder")
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return (f"{self.user}"
                 f"({self.created_at})"
-                f"{self.body}")
+                f"{self.synopsis}")
 # Feedbacks
 class Feedback(models.Model):
     post = models.ForeignKey(Post, on_delete=models.DO_NOTHING)

@@ -2,7 +2,6 @@
 {% load static %}
 {% block hero %}{% endblock hero %}
 {% block content %}
-
     <div class = "container" style="padding-top:100px;">
         <div class="row mt-5">
             <div class=" col-md-5 col-sm-12">
@@ -13,7 +12,7 @@
         <div class="row justify-content-center mt-3">
             <div class=" col-md-5 col-sm-12 border-bottom">
             <p><strong>{{post.user.username}}</strong> {{post.created_at}}</p>
-            <p>{{post.body}}</p>
+            <p>{{post.body|safe}}</p>
             </div>
         </div>
         {% if request.user.is_authenticated %}
@@ -25,7 +24,7 @@
                     <div class="d-grid gap-2">
                         <button class ="btn mt-3 mb-5" style="background: #e43c5c;"> Submit! </button>
                     </div>
-                </form>
+                </form>  
             </div>
         </div>
         {% endif %}

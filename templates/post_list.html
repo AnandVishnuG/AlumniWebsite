@@ -8,7 +8,7 @@
         <div class="row justify-content-center mt-3">
             <div class=" col-md-5 col-sm-12 border-bottom position-relative">
             <p><strong>{{post.user.username}}</strong> {{post.created_at}}</p>
-            <p>{{post.body}}</p>
+            <p>{{post.synopsis}}</p>
             <a class="stretched-link" href="/posts/{{post.pk}}"></a>
             </div>
         </div>
@@ -37,21 +37,8 @@
 
         {% endfor %}
         {% if request.user.is_authenticated %}
-        <div class="row justify-content-center mt-3">
-            <div class=" col-md-5 col-sm-12 border-bottom">
-                <h5>Add a post!</h5>
-            </div>
-        </div>
-        <div class="row justify-content-center mt-3">
-            <div class=" col-md-5 col-sm-12 border-bottom">
-                <form method="POST">
-                    {% csrf_token %}
-                    {{form}}
-                    <div class="d-grid gap-2">
-                        <button class ="btn mt-3 mb-5" style="background: #e43c5c;"> Submit! </button>
-                    </div>
-                </form>
-            </div>
+        <div class="d-grid gap-2">
+          <button class ="btn mt-3 mb-5" style="background: #e43c5c;"> <a href="/add_post/" style="background: #fff;">Add a post </a></button>
         </div>
         {% endif %}
     </div>

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'main.apps.MainConfig',
     'authentication',
+    'ckeditor',
     # 'debug_toolbar'
 ]
 
