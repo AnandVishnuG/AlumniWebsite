@@ -4,7 +4,15 @@
 {% block hero %}{% endblock hero %}
 {% block content %}
 {% if request.user.is_authenticated %}
-    <!--div class = "container" style="padding-top:100px;">
+    <div class = "container" style="padding-top:100px;">
+        <div class="row mt-5">
+            <div class=" col-md-5 col-sm-12">
+                <a href="/posts/" style="border-radius:50px; height:40px; width:40px; background:#e43c5c; font-size: 28px; color: #fff; line-height: 0;" 
+                   class="d-flex align-items-center justify-content-center">
+                    <i class="bi bi-arrow-left-short"></i>
+                </a>
+            </div>
+        </div>
         <div class="row justify-content-center mt-3">
             <div class=" col-md-5 col-sm-12 border-bottom">
                 <h5>Add a post!</h5>
@@ -14,6 +22,8 @@
             <div class=" col-md-5 col-sm-12 border-bottom">
                 <form method="POST">
                     {% csrf_token %}
+                    {% load bootstrap4 %}
+                    {% bootstrap_javascript jquery='full' %}
                     {{form.media}}
                     {{form.as_p}}
                     <div class="d-grid gap-2">
@@ -22,31 +32,7 @@
                 </form>
             </div>
         </div>
-    </div-->
-    <div class="container" style="padding-top: 100px;">
-    <div class="container mt-5 mb-5" >
-        <div class="row d-flex align-items-center justify-content-center">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="d-flex justify-content-between p-2 px-3">
-                        <div class="d-flex flex-row align-items-center"> <img src="https://i.imgur.com/UXdKE3o.jpg" width="50" class="rounded-circle">
-                            <div class="d-flex flex-column ml-2"> <span class="font-weight-bold">Jeanette Sun</span> <small class="text-primary">Collegues</small> </div>
-                        </div>
-                        <div class="d-flex flex-row mt-1 ellipsis"> <small class="mr-2">20 mins</small> <i class="fa fa-ellipsis-h"></i> </div>
-                    </div> <img src="https://i.imgur.com/xhzhaGA.jpg" class="img-fluid">
-                    <div class="p-2">
-                        <p class="text-justify">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.</p>
-                        <hr>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="d-flex flex-row icons d-flex align-items-center"> <i class="fa fa-heart"></i> <i class="fa fa-smile-o ml-2"></i> </div>
-                            <div class="d-flex flex-row muted-color"> <span>2 comments</span> <span class="ml-2">Share</span> </div>
-                        </div>
-                        <hr>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-</div>
+    
 {% endif %}
 {% endblock content %}

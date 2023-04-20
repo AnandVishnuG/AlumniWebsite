@@ -2,8 +2,13 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.contrib import messages
 from django.views import View
+from django.utils import timezone
+
 from .models import Profile, Post
 from .forms import PostForm, FeedbackForm
+from datetime import datetime
+
+import pytz
 # Create your views here.
 
 def index(request):
@@ -56,10 +61,14 @@ def editUserProfile(request, pk):
 class PostListView( View ):
     
    def get(self, request, *args, **kwargs):
-        profile = Profile.objects.all()
-        posts = Post.objects.all().order_by("-created_at")
+        posts = Post.objects.all().order_by("-publish_date").filter(publish_date__lte=timezone.now().astimezone(pytz.utc))
+        print(posts[0].created_at)
+        print(posts[0].publish_date)
+        print(timezone.now().astimezone(pytz.utc))
+        print(len(posts))
+        
         form = PostForm()
-        return render(request, 'post_list.html', {'profile':profile, 'post_list' : posts, 'form':form})
+        return render(request, 'post_list.html', {'post_list' : posts, 'form':form})
    def post(self, request, *args, **kwargs):
         posts = Post.objects.all().order_by("-created_at")
         form = PostForm(request.POST)
@@ -74,6 +83,7 @@ class PostDetailView(View):
         post = Post.objects.get(pk=pk)
         form = FeedbackForm()
         return render(request, 'post_detail.html',{'post':post, 'form':form})
+    
 class PostCreateView(View):
    def get(self, request, *args, **kwargs):
         form = PostForm(request.POST) 

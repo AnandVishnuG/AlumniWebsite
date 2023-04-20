@@ -11,6 +11,11 @@ six = "*"
 pillow = "*"
 django-tinymce = "*"
 django-ckeditor = "*"
+django-datetimepicker = "*"
+django-bootstrap-datepicker-plus = "*"
+django-bootstrap5 = "*"
+django-bootstrap4 = "*"
+pytz = "*"
 
 [dev-packages]
 

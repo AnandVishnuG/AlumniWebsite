@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'authentication',
     'ckeditor',
+    'bootstrap4',
+    'bootstrap_datepicker_plus',
     # 'debug_toolbar'
 ]
 
