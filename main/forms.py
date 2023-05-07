@@ -77,6 +77,6 @@ PollFormSet = modelformset_factory(Poll_choice, fields=("choice",), extra=0, min
 
 class ProductsForm(ModelForm):
     class Meta: 
-        model=Products
+        model=Product
         fields = "__all__"
 

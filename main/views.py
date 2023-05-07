@@ -277,19 +277,19 @@ class DashboardView(View):
     
 class ProductDetailView(View):
     def get(self, request, *args, **kwargs):
-        products = Products.objects.all()
+        products = Product.objects.all()
         print(products)
         return render(request, 'dashboard\dashboard_product.html',{'products':products})
     
 class ProductEditView(View):
         
     def get(self, request, pk, *args, **kwargs):
-            products = Products.objects.get(id = pk)
+            products = Product.objects.get(id = pk)
             form = ProductsForm(instance=products)
             return render(request, 'dashboard/dashboard_product_edit.html', {'products':products, 'form':form})
         
     def post(self, request, pk, *args, **kwargs):
-            products = Products.objects.get(id=pk)
+            products = Product.objects.get(id=pk)
             form = ProductsForm(request.POST, request.FILES, instance=products)
             if form.is_valid():
                 form.save()
@@ -299,6 +299,6 @@ class ProductEditView(View):
                 return render(request, 'dashboard/dashboard_product_edit.html', {'form': form, 'products':products})
             
 def product_destroy(request, id):
-         products = Products.objects.get(id=id)
+         products = Product.objects.get(id=id)
          products.delete()
          return redirect('/dashboard/dashboard_products')
