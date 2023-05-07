@@ -57,3 +57,4 @@ class Products(models.Model):
     product_desc = models.CharField(max_length=300)
     product_image = models.ImageField(upload_to='shop/images', default="")
     
+

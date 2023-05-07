@@ -1,0 +1,47 @@
+{% extends 'dashboard/dashboard.html' %}
+{% load static %}
+{% static 'css/dashboard.css' %}
+{% block hero %}
+
+{% endblock hero %}
+
+{% block table  %}
+<div class="content-wrapper" >
+    <section class="content-header">
+        <div class="container-fluid">
+<div class="card">
+<div class="card-header">
+        <h2 class="card-title">Edit Products</h2>
+        
+<div class="card-body">
+    <form method="POST" >
+        {% csrf_token %}
+        <div>
+            <label for="{{ form.product_name.id_for_label }}">Product Name:</label>
+            {{ form.product_name }}
+        </div>
+        <div>
+            <label for="{{ form.product_category.id_for_label }}">Product Category:</label>
+            {{ form.product_category }}
+        </div>
+        <div>
+            <label for="{{ form.product_subcategory.id_for_label }}">Product Subcategory:</label>
+            {{ form.product_subcategory }}
+        </div>
+        <div>
+            <label for="{{ form.product_price.id_for_label }}">Product Price:</label>
+            {{ form.product_price }}
+        </div>
+        <div>
+            <label for="{{ form.product_desc.id_for_label }}">Product Description:</label>
+            {{ form.product_desc }}
+        </div>
+        <div>
+            <label for="{{ form.product_image.id_for_label }}">Product Image:</label>
+            {{ form.product_image }}
+        </div>
+        <input type="submit" value="Update">
+    </form>
+</div>
+
+{% endblock table %}

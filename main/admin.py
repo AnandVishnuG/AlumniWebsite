@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
-from main.models import Profile, Products, Post, Image
+from main.models import Profile, Post, Image, Products
 
 # Unregister Group
 # admin.site.unregister(Group)

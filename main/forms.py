@@ -1,5 +1,5 @@
 from django.forms import ModelForm, CharField, Textarea, DateTimeField
-from . models import Post, Feedback
+from . models import Post, Feedback, Products
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from django.utils import timezone
 import pytz
@@ -32,3 +32,9 @@ class FeedbackForm(ModelForm):
     class Meta:
         model = Feedback
         fields = ['comment']                    
+
+class ProductsForm(ModelForm):
+    class Meta: 
+        model=Products
+        fields = "__all__"
+

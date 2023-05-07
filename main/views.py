@@ -4,8 +4,8 @@ from django.contrib import messages
 from django.views import View
 from django.utils import timezone
 
-from .models import Profile, Post
-from .forms import PostForm, FeedbackForm
+from .models import Profile, Post, Products
+from .forms import PostForm, FeedbackForm, ProductsForm
 from datetime import datetime
 
 import pytz
@@ -104,3 +104,36 @@ class ServiceListView(View):
 class CartListView(View):
     def get(self, request, *args, **kwargs):
         return render(request, "cart.html", {})
+    
+
+class DashboardView(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, "dashboard\dashboard.html", {})
+    
+class ProductDetailView(View):
+    def get(self, request, *args, **kwargs):
+        products = Products.objects.all()
+        print(products)
+        return render(request, 'dashboard\dashboard_product.html',{'products':products})
+    
+class ProductEditView(View):
+        
+    def get(self, request, pk, *args, **kwargs):
+            products = Products.objects.get(id = pk)
+            form = ProductsForm(instance=products)
+            return render(request, 'dashboard/dashboard_product_edit.html', {'products':products, 'form':form})
+        
+    def post(self, request, pk, *args, **kwargs):
+            products = Products.objects.get(id=pk)
+            form = ProductsForm(request.POST, request.FILES, instance=products)
+            if form.is_valid():
+                form.save()
+                return redirect('/dashboard/dashboard_products')
+            else:
+                form = ProductsForm(instance=products)
+                return render(request, 'dashboard/dashboard_product_edit.html', {'form': form, 'products':products})
+            
+def product_destroy(request, id):
+         products = Products.objects.get(id=id)
+         products.delete()
+         return redirect('/dashboard/dashboard_products')

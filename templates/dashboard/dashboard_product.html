@@ -1,0 +1,61 @@
+{% extends 'dashboard/dashboard.html' %}
+{% load static %}
+{% static 'css/dashboard.css' %}
+{% block hero %}
+
+{% endblock hero %}
+
+{% block table  %}
+
+<div class="content-wrapper" >
+    <section class="content-header">
+        <div class="container-fluid">
+<div class="card">
+<div class="card-header">
+        <h2 class="card-title">Rooms Details</h2>
+        <div style="margin-left: auto"><a class="btn btn-primary" href="rooms_create.html">Add Products+</a></div>
+</div>
+<div class="card-body">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="rooms">
+            <thead>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Product Category</th>
+                <th>Product Subcategory</th>
+                <th>Product Price</th>
+                <th>Product Description</th>
+                {% comment %} <th>Product Image</th> {% endcomment %}
+                <th>Action</th>
+            <tbody>
+                {% if products %}
+
+                {% for product in products %}
+                 <tr>
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.product_name }}</td>
+                    <td>{{ product.product_category }}</td>
+                    <td>{{ product.product_subcategory }}</td>
+                    <td>{{ product.product_price }}</td>
+                    <td>{{ product.product_desc }}</td>
+                    {% comment %} <td><img src="{{ product.product_image.url }}" alt="{{ product.product_name }} style="width: 10px; height: 15px;></td> {% endcomment %}
+                    <td>
+                        <form action="" method="post">
+                            {% csrf_token %}
+                        <button type="submit" class="btn btn-primary" ><a href="/dashboard/dashboard_products_edit/{{product.id}}" style="color: white;">Update</a></button>
+                        </form>
+                    </td>
+                    <td><button type="submit" class="btn btn-danger"><a href="/dashboard/dashboard_products_delete/{{product.id}}" style="color: white;">Delete</a></button></td>
+                 </tr>
+                 {% endfor %}
+                 {% endif %}
+           </tbody>
+        </table>
+    </div>
+</div>
+</div>
+        </div>
+    </section>
+</div>
+
+{% endblock table %}

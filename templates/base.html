@@ -168,7 +168,7 @@
   {% endblock hero %}
 
   <main id="main">
-    <div class="container">
+    {% comment %} <div class="container"> {% endcomment %}
     {% block content %}
         <!-- ======= About Section ======= -->
         <section id="about" class="about">
@@ -366,7 +366,7 @@
     </section><!-- End Contact Section -->
 
     {% endblock content %}
-    </div>
+    {% comment %} </div> {% endcomment %}
     
   </main><!-- End #main -->
 
