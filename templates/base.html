@@ -66,6 +66,37 @@
   .navbar .dropdown ul a {
     padding: 0;
   }
+  .posts #posts-filters {
+    padding: 0;
+    margin: 0 auto 25px auto;
+    list-style: none;
+    text-align: center;
+    border-radius: 50px;
+  }
+  
+  .posts #posts-filters li {
+    cursor: pointer;
+    display: inline-block;
+    padding: 7px 17px 9px 17px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+    color: #444444;
+    margin: 0 3px 10px 3px;
+    transition: all ease-in-out 0.3s;
+    background: #ede9e9;
+    border-radius: 50px;
+  }
+  
+  .posts #posts-filters li:hover,
+  .posts #posts-filters li.filter-active {
+    color: #fff;
+    background: #e43c5c;
+  }
+  
+  .post #post-filters li:last-child {
+    margin-right: 0;
+  }
 </style>
 </head>
 
@@ -80,7 +111,8 @@
           <li class="nav-item"><a class="nav-link scrollto" href="/posts/">News</a></li>
           {% if request.user.is_authenticated  %}
           <li class="nav-item"><a class="nav-link scrollto" href="/alumni_list/">Members</a></li>
-          <li class="nav-item"><a class="nav-link scrollto" href="/services/">Services</a></li>
+          <li class="nav-item"><a class="nav-link scrollto" href="/products/">Products</a></li>
+          <li class="nav-item"><a class="nav-link scrollto" href="/polls/">Polls</a></li>
           {% endif %}
           <li class="nav-item"><a class="nav-link scrollto" href="/#about">About</a></li>
           <li class="nav-item"><a class="nav-link scrollto" href="/#team">Team</a></li>
@@ -90,7 +122,16 @@
       
         <!--ul class="navbar-nav ms-auto"-->
           <!-- Icon -->
-          <li><a class="link-secondary me-3" href="/cart/"><i class="fas fa-shopping-cart fa-xl" style="color: #fff;"></i></a></li>
+          <li class="nav-item"><a class=" me-3" href="/cart/">
+            <i class="fas fa-shopping-cart" style="color: #fff; font-size:16px;"></i>
+            {% if cartCount %}
+              <span class="position-absolute translate-middle badge rounded-pill bg-danger" style="margin-left:2rem;">
+                {{cartCount}}
+                <span class="visually-hidden">unread messages</span>
+              </span>
+            {% endif %}
+            </a>
+          </li>
           <!-- Avatar -->
           <li><div class="dropdown">
             <a class="dropdown-toggle nav-link d-flex align-items-center hidden-arrow" href="#" id="navbarDropdownMenuAvatar" 

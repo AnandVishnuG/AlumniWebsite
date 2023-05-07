@@ -2,34 +2,68 @@
 {% load static %}
 {% block hero %}{% endblock hero %}
 {% block content %}
-    <div class = "container" style="padding-top:100px;">
-        <div class="row mt-5">
-            <div class=" col-md-5 col-sm-12">
-                <a href="/posts/" style="border-radius:50px; height:40px; width:40px; background:#e43c5c; font-size: 28px; color: #fff; line-height: 0;" 
-                   class="d-flex align-items-center justify-content-center">
-                    <i class="bi bi-arrow-left-short"></i>
-                </a>
+    <section id="post-detail" style="padding-top:100px;">
+        <div class="container">    
+            <div class="section-title">
+              <h2>All posts</h2>
+              <h3>View <span>Post</span></h3>
+              <p>{{post.synopsis}}</p>
             </div>
-        </div>
-        
-        <div class="row justify-content-center mt-3">
-            <div class=" col-md-5 col-sm-12 border-bottom">
-            <p><strong>{{post.user.username}}</strong> {{post.created_at}}</p>
-            <p>{{post.body|safe}}</p>
+    
+            <div class="row">
+                <div class=" col-md-5 col-sm-12">
+                    <a href="/posts/" style="border-radius:50px; height:40px; width:40px; background:#e43c5c; font-size: 28px; color: #fff; line-height: 0;" 
+                    class="d-flex align-items-center justify-content-center">
+                        <i class="bi bi-arrow-left-short"></i>
+                    </a>
+                </div>
             </div>
-        </div>
-        {% if request.user.is_authenticated %}
-        <div class="row justify-content-center mt-3">
-            <div class=" col-md-5 col-sm-12 border-bottom">
-                <form method="POST">
-                    {% csrf_token %}
-                    {{form}}
-                    <div class="d-grid gap-2">
-                        <button class ="btn mt-3 mb-5" style="background: #e43c5c;"> Submit! </button>
+            <div class="row d-flex align-items-center justify-content-center">
+                <div class="col-md-10">       
+                    <div class="card m-3 post-item" style="width:100%">
+                        <div class="card-header position-relative">
+                            <div class="d-flex flex-row align-items-center"> 
+                            {% if post.user.profile.avatar  %}
+                            <img src= "{{post.user.profile.avatar.url}}" width="50" height="50" class="rounded-circle">
+                            {% else %}
+                            <img src= "{% static 'assets\img\profile\default-profile-photo.jpg' %}" width="50" height="50" class="rounded-circle">
+                            {% endif %}   
+                                <div class="d-flex flex-column mx-3"> 
+                                    <span><strong>{{post.user.username}}</strong></span> 
+                                    <small class="text-primary">{{post.user.profile.career_position}}</small> 
+                                </div>                          
+                                <div class="d-flex flex-row mt-1 ms-auto text-muted"> <small class="mr-2"> {{ post.publish_date|timesince }} ago </small> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-2">
+                            <p class="ps-3">{{post.body|safe}}</p>
+                            {% if request.user == post.user %}
+                            <hr>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="d-flex flex-row text-muted ms-auto"> 
+                                    <a href="/edit_post/{{post.id}}"> <i class="bi bi-pencil-square fa-lg me-3"></i></a>
+                                    <a href="/delete_post/{{post.id}}"> <i class="bi bi-backspace-fill fa-lg "></i></a> 
+                                </div>
+                            </div> 
+                            {% endif %}
+                        </div>
                     </div>
-                </form>  
+                </div>
             </div>
+            {% if request.user.is_authenticated %}
+            <div class="row justify-content-center mt-3">
+                <div class=" col-md-5 col-sm-12 border-bottom">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{form}}
+                        <div class="d-grid gap-2">
+                            <button class ="btn mt-3 mb-5" style="background: #e43c5c;"> Submit! </button>
+                        </div>
+                    </form>  
+                </div>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
-    </div>
+    </section>
 {% endblock content %}
