@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}All posts{% endblock title %}
+
+{% block hero %}{% endblock hero %}
+{% block content %}
+<section id="create_poll" style="padding-top:100px;">
+    <div class="container">    
+        <div class="section-title">
+          <h2>Create polls</h2>
+          <h3>Add a new <span>Poll</span></h3>
+        </div>
+        
+        {% if request.user.is_authenticated %}
+        <div class="container pt-5  mb-5 " style="background:#EEE" >
+            <div class="row">
+                <div class="c-stepper">
+                    <div class="c-stepper__item col-lg-4 col-md-4 col-sm-4" id="step_1" onclick="showElement('question_container')">
+                        <h3 class="c-stepper__title ">Step 1</h3>
+                        <p class="c-stepper__desc">Question</p>
+                    </div>
+                    <div class="c-stepper__item col-lg-4 col-md-4 col-sm-4" id="step_3" onclick="showElement('choice_container')">
+                        <h3 class="c-stepper__title">Step 2</h3>
+                        <p class="c-stepper__desc">Choices</p>
+                    </div>
+                    <div class="c-stepper__item col-lg-4 col-md-4 col-sm-4" id="step_2" onclick="showElement('pdate_container')">
+                        <h3 class="c-stepper__title">Step 3</h3>
+                        <p class="c-stepper__desc">Schedule </p>
+                    </div>
+                    
+                </div>        
+            </div>    
+            <div class="row justify-content-center mt-3">
+                <div class=" col-md-5 col-sm-12 border-bottom">
+                    <form id="form-container" method="POST">
+                        {% csrf_token %}
+                        {% load bootstrap4 %}
+                        {% bootstrap_javascript jquery='full' %}
+                        {{form.media}}
+                        <div class="container text-center" id="question_container" >
+                            {{form.question}}
+                        </div>
+                        <div class="container text-center" id="pdate_container" style="display:none;">
+                            {{form.publish_date}}
+                        </div>
+                        {{formSet.management_form}}
+                        <div class="container text-center" id="choice_container"style="display:none;">
+                        {% for choiceForm in formSet %}
+                        <div class = "poll-form">
+                        {{choiceForm}}
+                        </div>
+                        {% endfor %}
+                    </div>
+                        <div id="btn-form" class="text-end">
+                        <i id="add-form" class="fa fa-plus text-center"style="border-radius: 50px;height: 30px; width: 30px;
+                        background: #e43c5c;
+                        font-size: 28px;
+                        color: #fff;" ></i>
+                        <i id="delete-form" class="fa fa-minus text-center"style="border-radius: 50px;height: 30px;width: 30px;
+                        background: #e43c5c;
+                        font-size: 28px;
+                        color: #fff;"></i>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class ="btn mt-3 mb-5" style="background: #e43c5c;"> Submit! </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+   </div>
+</section>
+{% endblock %}
+

@@ -11,18 +11,21 @@ from django.views.generic import View
 from django.contrib.auth import authenticate, login, logout
 from .utils import generate_token, TokenGenerator
 
+from main.models import Profile
+
 # Create your views here.
 def signup(request):
     if request.method == 'POST':
         name = request.POST['name']
         email = request.POST['email']
+        schoolId = request.POST['school_id']
         password = request.POST['password1']
         confirmPassword = request.POST['password2']
         if password != confirmPassword:
             messages.warning(request, "Passwords don't match!")
             return render(request, "authentication/signup.html")            
         try:
-            if User.objects.get(username=email):
+            if User.objects.get(username=name):
                 messages.warning(request, "User already exist!")
                 return render(request, "authentication/signup.html")            
         except Exception as ide:
@@ -30,6 +33,9 @@ def signup(request):
         user = User.objects.create_user(name, email, password)
         user.is_active = False
         user.save()    
+        user.profile.school_id = schoolId
+        user.profile.save()
+        user.save()
         email_subject = "New Alumni registered"
         message = render_to_string('authentication/activate.html',
                                    {

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
-from main.models import Profile, Post, Image, Products
+from main.models import Profile, Product, Cart, CartItem, Post, Image, Feedback, Poll, Poll_choice
 
 # Unregister Group
 # admin.site.unregister(Group)
@@ -8,4 +8,11 @@ from main.models import Profile, Post, Image, Products
 admin.site.register(Profile)
 admin.site.register(Post)
 admin.site.register(Image)
-admin.site.register(Products)
+# admin.site.unregister(Product)
+admin.site.register(Product)
+admin.site.register(Cart)
+admin.site.register(CartItem)
+admin.site.register(Feedback)
+admin.site.register(Poll)
+admin.site.register(Poll_choice)
+

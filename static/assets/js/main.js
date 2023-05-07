@@ -176,7 +176,33 @@
     }
 
   });
+  /** Post filter and isotope */
+window.addEventListener('load', () => {
 
+  let postContainer = select('.post-container');
+  if (postContainer) {
+    let postIsotope = new Isotope(postContainer, {
+      itemSelector: '.post-item',
+      layoutMode: 'vertical',
+    });
+
+    let postFilters = select('#post-filters li', true);
+
+    on('click', '#post-filters li', function(e) {
+      e.preventDefault();
+      postFilters.forEach(function(el) {
+        el.classList.remove('filter-active');
+      });
+      this.classList.add('filter-active');
+
+      postIsotope.arrange({
+        filter: this.getAttribute('data-filter')
+      });
+    }, true);
+  }
+});
+
+  
   /**
    * Initiate portfolio lightbox 
    */
@@ -213,3 +239,95 @@
   });
 
 })()
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  /**
+   * Update choices when post is being created
+   */
+  
+  let pollForm = document.querySelectorAll(".poll-form")
+  let container = document.querySelector("#form-container")
+  let btnContainer = document.querySelector("#btn-form")
+  let addButton = document.querySelector("#add-form")
+  let delButton = document.querySelector("#delete-form")
+
+  let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+  let formNum = pollForm.length-1 
+  if (addButton){
+  addButton.addEventListener('click', addForm)
+  delButton.addEventListener('click', delForm)
+}
+  function addForm(e) {
+    e.preventDefault()
+
+    let newForm = pollForm[0].cloneNode(true) //Clone the poll form
+    let formRegex = RegExp(`form-(\\d){1}-`,'g') //Regex to find all instances of the form number
+    
+    formNum++ //Increment the form number
+    newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`) //Update the new form to have the correct form number
+    container.insertBefore(newForm, btnContainer) //Insert the new form at the end of the list of forms
+
+    totalForms.setAttribute('value', `${formNum+1}`) //Increment the number of total forms in the management form
+
+  }
+
+  function delForm(e) {
+    e.preventDefault()
+
+    // Get the form to be deleted
+    let pollForm = document.querySelectorAll(".poll-form")
+    let formNum = pollForm.length-1 
+    let formToDelete = pollForm[formNum]
+
+    // Check if the form exists
+    if (formToDelete) {
+      // Delete the form
+      formToDelete.remove()
+
+      // Decrement the number of total forms
+      let totalForms = document.querySelector("#id_form-TOTAL_FORMS")
+      totalForms.setAttribute('value', `${totalForms.value - 1}`)
+      }
+  }
+
+});
+// Step javascript
+
+function showElement(elementId) {
+  var questionContainer = document.getElementById('question_container');
+  var pdateContainer = document.getElementById('pdate_container');
+  var choiceContainer = document.getElementById('choice_container');
+  var beforePdateContainer = document.getElementById('step_1')
+  // Hide all containers
+  questionContainer.style.display = 'none';
+  pdateContainer.style.display = 'none';
+  choiceContainer.style.display = 'none';
+
+  // Show the appropriate container
+  switch (elementId) {
+    case 'question_container':
+      questionContainer.style.display = 'block';
+      break;
+    case 'pdate_container':
+      pdateContainer.style.display = 'block';
+      
+      break;
+    case 'choice_container':
+      choiceContainer.style.display = 'block';
+      break;
+  }
+}
+// Setting centering for Publish_date
+document.addEventListener('DOMContentLoaded', function() {
+
+// Center stepper 2 pd_date
+// get the parent and child elements
+var parent = document.getElementById('pdate_container');
+if (parent){
+var child = parent.firstElementChild;
+
+// set the left property of the child element
+child.style.left = '20%';
+}
+});

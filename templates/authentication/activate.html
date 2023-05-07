@@ -1,7 +1,8 @@
 {% autoescape off %}
-
 Hi, 
+
 A new user: {{user.username}} ({{user.email}}) has registered to the Alumni Website. 
+School ID: {{user.profile.school_id}}
 
 Please click the below link to activate the account.
 http://{{domain}}{% url 'activate' uidb64=uid token=token %}
