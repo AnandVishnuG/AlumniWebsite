@@ -1,20 +1,25 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
 from django.contrib import messages
+from django.conf import settings
 from django.views import View
 from django.utils import timezone
 from django.forms.models import model_to_dict
 from django.forms import HiddenInput, formset_factory
-from .models import Profile, Product, Post, Poll_choice, Cart, CartItem
-from .forms import PostForm, FeedbackForm, PollForm, PollChoiceForm, PollFormSet, CartForm, CartFormSet, ProductsForm
+from .models import Profile, Product, Post, Poll_choice, Cart, CartItem, Order, OrderItem, BillingAddress
+from .forms import PostForm, FeedbackForm, PollForm, PollChoiceForm, PollFormSet, CartForm, CartFormSet, ProductsForm, BillingAddressForm
 from .decorators import group_required
 from .mixins import CheckAdminGroupMixin, CheckEditorGroupMixin
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import FileSystemStorage
 from decimal import Decimal
 import pytz
 import json
-
+import requests
+import os
+import datetime
 # Groups and Permissions
 @login_required
 def addToEditorGroup(request):
@@ -244,15 +249,37 @@ def addToCart(request, pk):
         cart.updated_at=timezone.now()
         cart.total += product.product_price
         cart.save()
-    return redirect('/products/')    
+    return redirect('/products/')
+
+@login_required
+def deleteFromCart(request, pk):
+    # Fetch the request user
+    user = User.objects.get(id=request.user.id)
+    # Fetch the product supplied
+    cartItem = CartItem.objects.get(pk=pk)
+    # Fetch cart if it exists
+    cart = Cart.objects.filter(user=request.user, isPaid=False).first()
+    # Fetch cart item if it exists
+    # If no cart available, create new cart and increase the count
+    cart.total -= ( cartItem.product.product_price * Decimal(cartItem.quantity) )   
+    cartItem.delete()
+    cart.count -= 1
+    cart.updated_at=timezone.now()
+    cart.save()
+    return redirect('/cart/')
+    
 class CartListView(View):
     def get(self, request, *args, **kwargs):
         cart = Cart.objects.filter(user= request.user, isPaid=False).first()
+        if not cart:
+            messages.error(request, "You have no items in cart!")
+            return redirect("/products/")
         cartItems = CartItem.objects.filter(cart=cart)
         form = CartForm(initial= model_to_dict(cart))
         formSet = CartFormSet(initial= [model_to_dict(item) for item in cartItems] if cartItems else [])
-        return render(request, "cart1.html", {'cart':cart, 'cartItems':cartItems, 'form':form, 'formSet':formSet})
+        return render(request, "cart.html", {'cart':cart, 'cartItems':cartItems, 'form':form, 'formSet':formSet})
 
+@login_required
 def updateCart(request, pk):
     data = json.loads(request.body)
     cartItemId = data['cartItemId']
@@ -269,7 +296,143 @@ def updateCart(request, pk):
         'total': cart.total,
     }
     return JsonResponse(response_data, safe=False)
+
+class CheckoutDetailView(View):
+    def get(self, request, *args, **kwargs):
+        cart = Cart.objects.filter(user=request.user, isPaid=False).first()
+        billingAddress = BillingAddress.objects.filter(user= request.user).first()
+        cartItems = CartItem.objects.filter(cart=cart)
+        if not billingAddress:
+            billingAddress = BillingAddress.objects.create(user= request.user)
+        initial=model_to_dict(billingAddress)
+        form = BillingAddressForm(instance=billingAddress)
+        for _, field in form.fields.items():
+            field.widget.attrs['class'] = 'form-control mx-1'    
+            
+        
+        return render(request, "checkout.html", {'form':form, 'cart':cart,'cartItems':cartItems})
+    def post(self, request, *args, **kwargs):
+        cart = Cart.objects.filter(user=request.user, isPaid=False).first()
+        billingAddress = BillingAddress.objects.filter(user= request.user).first()
+        saveToDB = request.POST.get("saveToDB")
+        # shipping_charge = Decimal(request.POST.get("shipping_cost"))
+        # order_id = request.session.get('order_id')
+        # try:
+        #     order = Order.objects.get(id=order_id)
+        #     order.shipping_charge = shipping_charge
+        #     order.save()
+        # except Order.DoesNotExist:
+        #     order = Order.objects.create(user=request.user, shipping_address=billingAddress, shipping_charge=shipping_charge)
+        #     request.session['order_id'] = order.id        
+        
+        cartItems = CartItem.objects.filter(cart=cart)
+        # for item in cartItems:
+        #     orderItem, isCreated = OrderItem.objects.get_or_create(order=order, 
+        #                                                             product= item.product, 
+        #                                                             quantity= item.quantity,
+        #                                                             price=item.product.product_price, )
+        # If billing address is saved
+        form = BillingAddressForm(request.POST, instance=billingAddress) 
+        valid= False
+        for _, field in form.fields.items():
+            field.widget.attrs['class'] = 'form-control mx-1'    
+            field.widget.attrs['disabled'] = True
+        if form.is_valid():
+            valid = True
+            form.save()
+        return render(request, "checkout.html", {'form':form, 'cart':cart,'cartItems':cartItems, 'valid':valid, 'saveToDB':saveToDB})
+
+@login_required
+def proceedToPay(request, form):
+    billingAddress = BillingAddress.objects.filter(user= request.user).first()
+    order_id = request.session.get('order_id')
+    try:
+        order = Order.objects.get(id=order_id)
+    except:
+        return redirect("/cart/")
+    if billingAddress:
+        form = BillingAddressForm(request.POST, initial=model_to_dict(billingAddress), instance=billingAddress)
+    else:
+        billingAddress = BillingAddress.objects.create(user= request.user)
+        form = BillingAddressForm(request.POST, instance=billingAddress)
+
+    for _, field in form.fields.items():
+        field.widget.attrs['class'] = 'form-control mx-1'    
+        
+    if form.is_valid():
+        # form.save()
+         billing_address = form.save(commit=False)
+         billing_address.user = request.user
+         billing_address.save()
+         order.shipping_address=billing_address
+         order.save()
+         cart = Cart.objects.filter(user=request.user, isPaid=False).first()
+         cart.isPaid = True
+         cart.save()
+         messages.success(request, "Payment successs!")
+         return redirect("/")
+    else:
+        for field_name, errors in form.errors.items():
+            if errors:
+                print(f"{field_name} is not valid: {', '.join(errors)}")
+    messages.error(request, "Payment failed!")
+    return redirect("/cart/")
+@login_required
+def create_paypal_order(request):
+    form_data = json.loads(request.body)
+    print(form_data)
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    # Create the order
+    payload = {
+        "intent": "CAPTURE",
+        "purchase_units": [
+            {
+                "amount": {
+                    "currency_code": "USD",
+                    "value": "100.00",
+                },
+            },
+        ],
+    }
+    response = requests.post(
+        f"{settings.PAYPAL_BASE_URL}/v2/checkout/orders",
+        headers=headers,
+        json=payload,
+        auth=(settings.PAYPAL_CLIENT_ID, settings.PAYPAL_APP_SECRET),
+    )
+    order = response.json()
+    print(order)
+    # Return the order ID to the client
+    return JsonResponse({"id": order["id"]})
+
+@csrf_exempt
+def capture_paypal_order(request):
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    # Capture the payment
+    data = json.loads(request.body)
+    order_id = data["orderID"]
     
+    response = requests.post(
+        f"{settings.PAYPAL_BASE_URL}/v2/checkout/orders/{order_id}/capture",
+        headers=headers,
+        auth=(settings.PAYPAL_CLIENT_ID, settings.PAYPAL_APP_SECRET),
+    )
+    capture_data = response.json()
+    print(capture_data)
+    # Store payment information such as the transaction ID
+
+    # Return the capture data to the client
+    return JsonResponse(capture_data)
+
+
+
+
 
 class DashboardView(View):
     def get(self, request, *args, **kwargs):
@@ -302,3 +465,112 @@ def product_destroy(request, id):
          products = Product.objects.get(id=id)
          products.delete()
          return redirect('/dashboard/dashboard_products')
+
+class FileListView(View):
+    def get(self, request, *args, **kwargs):
+        base_path = os.path.join(settings.MEDIA_ROOT, 'File Manager', request.user.email)
+        if not os.path.exists(base_path):
+            os.makedirs(base_path)
+        folders = os.listdir(base_path)
+        
+        return render(request, "dashboard\dashboard_filemanager.html", {'folders':folders} )
+@login_required
+def displayFolder(request, path):
+    base_path = os.path.join(settings.MEDIA_ROOT, 'File Manager', request.user.email)
+    folders = []
+    files = []
+    if '/folder/' in request.path:
+        full_path = os.path.join(base_path, path)
+        if os.path.exists(full_path):
+            for item in os.listdir(full_path):
+                item_path = os.path.join(full_path, item)
+                if os.path.isdir(item_path):
+                    folders.append(item)
+                else:
+                    file_path = item_path
+                    if os.path.isfile(file_path):
+                        file_size = os.stat(file_path).st_size
+                        file_size_str = ""
+                        if file_size < 1024:
+                            file_size_str = f"{file_size} B"
+                        elif file_size < 1024**2:
+                            file_size_str = f"{round(file_size/1024, 2)} KB"
+                        elif file_size < 1024**3:
+                            file_size_str = f"{round(file_size/1024**2, 2)} MB"
+                        else:
+                            file_size_str = f"{round(file_size/1024**3, 2)} GB"
+
+                        last_modified = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
+                        last_modified = last_modified.strftime('%Y-%m-%d %H:%M:%S')
+                        file_data = {
+                            "name": os.path.basename(file_path),
+                            "type": os.path.splitext(os.path.basename(file_path))[1],
+                            "size": file_size_str,
+                            "last_modified": last_modified,
+                            "permissions": os.stat(file_path).st_mode,
+                            "filepath": settings.MEDIA_URL + file_path[len(settings.MEDIA_ROOT):]
+                        }
+                        files.append(file_data)
+
+    return render(request, "dashboard\dashboard_filemanager.html", {'folders': folders, 'files': files})
+class ImageListView(View):
+    def get(self, request, *args, **kwargs):
+        base_path = os.path.join(settings.MEDIA_ROOT, 'Image Manager', request.user.email)
+        if not os.path.exists(base_path):
+            os.makedirs(base_path)
+        folders = os.listdir(base_path)
+        
+        images = { folder:os.listdir(folder) for folder in folders}
+        
+        return render(request, "dashboard\dashboard_imagemanager.html", {'folders':folders} )
+
+@login_required
+def upload_file(request):
+    if request.method == 'POST':
+        folder_name = request.POST['folder_name']
+        uploaded_files = request.FILES.getlist('file')
+
+        # You can customize the file storage path based on your requirements
+        base_path = os.path.join(settings.MEDIA_ROOT, 'File Manager', request.user.email, folder_name)
+
+        for uploaded_file in uploaded_files:
+            fs = FileSystemStorage(location=base_path)
+            fs.save(uploaded_file.name, uploaded_file)
+
+        response = {"status": "success", "message": f"File(s) uploaded successfully."}
+        return JsonResponse(response)
+
+    return JsonResponse({"status": "error", "message": "Invalid request method."})
+
+@login_required
+def list_folders(request):
+    base_path = os.path.join(settings.MEDIA_ROOT, 'File Manager', request.user.email)
+    folders = os.listdir(base_path)
+    return JsonResponse({"folders": folders})
+
+
+@login_required
+def create_folder(request):
+    data=json.loads(request.body)
+    folder_name = data['folderName']
+    folder_path = os.path.join(settings.MEDIA_ROOT , 'File Manager/'+request.user.email+'/'+folder_name)
+    print(folder_path)
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        response = {"status": "success", "message": f"Folder '{folder_name}' created successfully."}
+    else:
+        response = {"status": "error", "message": f"Folder '{folder_name}' already exists."}
+
+    return JsonResponse(response)
+@login_required
+def list_images(request):
+    base_path = os.path.join(settings.MEDIA_ROOT, 'Image Manager', request.user.email)
+    images = []
+
+    for folder in os.listdir(base_path):
+        folder_path = os.path.join(base_path, folder)
+        for filename in os.listdir(folder_path):
+            if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                images.append({'folder': folder, 'filename': filename})
+    print(images)
+    return JsonResponse({"images": images})

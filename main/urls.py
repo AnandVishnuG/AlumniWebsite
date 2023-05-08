@@ -26,12 +26,27 @@ urlpatterns = [
     path("create_poll/",views.PollCreateView.as_view(), name="poll-create"),
     
     path("add_cart/<int:pk>",views.addToCart, name="addToCart"),
+    path("delete_cart/<int:pk>",views.deleteFromCart, name="deleteFromCart"),
     path("cart/",views.CartListView.as_view(), name="cart-list"),
     path("update_cart/<int:pk>",views.updateCart, name="updateCart"),
+    
    
+    path("checkout/",views.CheckoutDetailView.as_view(), name="checkout-detail"),
+    path("proceed_pay/",views.proceedToPay, name="proceedToPay"),
+    path("create_paypal_order/",views.create_paypal_order, name="createPaypalOrder"),
+    path("capture_paypal_order/",views.capture_paypal_order, name="capturePaypalOrder"),
+    
+    
     path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
     path("dashboard/dashboard_products", views.ProductDetailView.as_view(), name="dashboard_product"),
     path("dashboard/dashboard_products_edit/<int:pk>", views.ProductEditView.as_view(), name="product-edit"),
     # path("dashboard/dashboard_products_update/<int:id>", views.product_update, name="updateProduct"),
-    path("dashboard/dashboard_products_delete/<int:id>", views.product_destroy, name="deleteProduct")
+    path("dashboard/dashboard_products_delete/<int:id>", views.product_destroy, name="deleteProduct"),
+    path("dashboard/dashboard_filemanager/", views.FileListView.as_view(), name="file-list"),
+    path("dashboard/dashboard_imagemanager/", views.ImageListView.as_view(), name="image-list"),
+    
+    path('list_images/', views.list_images, name='list_images'),
+    path('create_folder/', views.create_folder, name='create_folder'),
+    path('upload_file/', views.upload_file, name='upload_file'),
+    path('folder/<path:path>/', views.displayFolder, name="displayFolder" ),   
 ]

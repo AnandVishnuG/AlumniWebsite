@@ -1,5 +1,5 @@
 from django.forms import ModelForm, CharField, Textarea, DateTimeField, IntegerField, ChoiceField, modelformset_factory
-from . models import Post, Feedback, Poll, Poll_choice, Cart, CartItem, Product
+from . models import Post, Feedback, Poll, Poll_choice, Cart, CartItem, Product, BillingAddress
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from django.utils import timezone
 import pytz
@@ -80,3 +80,8 @@ class ProductsForm(ModelForm):
         model=Product
         fields = "__all__"
 
+class BillingAddressForm(ModelForm):
+    class Meta:
+        model = BillingAddress
+        fields= ["first_name", "last_name", "email", "company_name", "country", "address","city", "state","zip_code" ]
+        # fields = "__all__"

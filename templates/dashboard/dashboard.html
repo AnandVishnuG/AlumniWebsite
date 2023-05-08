@@ -1,37 +1,54 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block hero %}
-
 {% endblock hero %}
-
 {% block content  %}
 <div style="padding-top: 80px;">
-    <div class="row flex-nowrap">
-        <div class=" col-md-3 col-xl-2 px-sm-2 px-3 bg-dark">
-            <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
-                <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                    <span class="fs-5 d-none d-sm-inline">Menu</span>
-                </a>
-                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link align-middle px-0">
-                            <i class="fa fa-user"></i> <span class="ms-1 d-none d-sm-inline">User Permission</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{% url 'dashboard_product' %}" class="nav-link align-middle px-0">
-                            <i class="fa fa-shopping-cart"></i> <span class="ms-1 d-none d-sm-inline">Products</span>
-                        </a>
-                    </li>
-                </ul>
-                <hr>
-                
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3 col-xl-2 px-3 bg-dark" id="sidebar">
+                <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                    <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                        <span class="fs-5 d-none d-sm-inline">Menu</span>
+                    </a>
+                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link align-middle px-0">
+                                <i class="fa fa-user"></i> <span class="ms-1 d-none d-sm-inline">User Permission</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'dashboard_product' %}" class="nav-link align-middle px-0">
+                                <i class="fa fa-shopping-cart"></i> <span class="ms-1 d-none d-sm-inline">Products</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/dashboard/dashboard_filemanager/" class="nav-link align-middle px-0">
+                                <i class="fa fa-user"></i> <span class="ms-1 d-none d-sm-inline">File Manager</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/dashboard/dashboard_imagemanager/" class="nav-link align-middle px-0">
+                                <i class="fa fa-user"></i> <span class="ms-1 d-none d-sm-inline">Image Manager</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <hr>
+                </div>
             </div>
-        </div>
-        <div class="col py-3">
-            {% block table %}{% endblock table %}
+            <div class="col-md-9 col-xl-10 py-3">
+                {% block table %}{% endblock table %}
+                {% block dashContent %} {% endblock dashContent %}
+            </div>
         </div>
     </div>
 </div>
-{% endblock content %}
+<script>
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("d-none");
+        sidebar.classList.toggle("d-md-block");
+    }
+</script>
 
+{% endblock content %}

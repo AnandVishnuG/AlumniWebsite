@@ -2,9 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.validators import RegexValidator
 from ckeditor.fields import RichTextField
 from datetime import datetime
 from PIL import Image as Img, ImageOps
+from decimal import Decimal
 import io
 
 # Profile is one-to-one with django user table, and can hold extra fields of User table
@@ -64,8 +66,9 @@ class Feedback(models.Model):
 
 # Product Model 
 class Product(models.Model):
-    product_id = models.AutoField
+    # product_id = models.AutoField
     product_name = models.CharField(max_length=100) 
+    product_isDigital = models.BooleanField(default=False, null= True, blank=False)
     product_category = models.CharField(max_length=100, default="") 
     product_subcategory = models.CharField(max_length=50, default="") 
     product_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -120,6 +123,35 @@ class CartItem(models.Model):
     quantity = models.PositiveBigIntegerField(default=1)
     def __str__(self):
         return str(self.product.product_name)
+# Billing address
+class BillingAddress(models.Model):
+    phone_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed."
+    )
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=30, blank= True)
+    email = models.EmailField(blank=True, null=True)
+    company_name = models.CharField(max_length=100, blank=True, null= True)
+    address = models.CharField(max_length=100)
+    phone_number = models.CharField(validators=[phone_regex], max_length=17, blank=True)
+    city = models.CharField(max_length=50)
+    state = models.CharField(max_length=50)
+    country = models.CharField(max_length=50)
+    zip_code = models.CharField(max_length=10)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.first_name:
+            self.first_name = self.user.first_name
+        if not self.last_name:
+            self.last_name = self.user.last_name
+        if not self.email:
+            self.email = self.user.email
+        super().save(*args, **kwargs)
 # Order table
 class Order(models.Model):
     STATUS_CHOICES = (
@@ -131,8 +163,47 @@ class Order(models.Model):
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     order_date = models.DateTimeField(auto_now_add=True)
+    transaction_id = models.CharField(max_length=200, null = True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    isShippable = models.BooleanField(default=False)
-    shipping_address = models.TextField(blank=True, null=True)
-    billing_address = models.TextField(blank=True, null=True)
-    total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    shipping_address = models.ForeignKey(BillingAddress, blank=True, null=True, on_delete=models.SET_NULL)
+    shipping_charge = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    @property
+    def get_total(self):
+        orderItems = self.orderitem_set.all()
+        total = sum([ item.get_total for item in orderItems])
+        return total 
+    @property
+    def get_total_shipping(self):
+        total = self.get_total + self.shipping_charge
+        return total
+    
+    @property
+    def get_count(self):
+        orderItems = self.orderitem_set.all()
+        count = sum([ item.quantity for item in orderItems])
+        return count
+    @property
+    def shipping(self):
+        shipping = False
+        orderItems = self.orderitem_set.all()
+        for item in orderItems:
+            if not item.product.product_isDigital:
+                shipping = True
+        return shipping 
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='orderitem_set')
+    
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    @property
+    def get_total(self):
+        total = self.product.product_price * Decimal(self.quantity)    
+        return total
+class File(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    file = models.FileField(upload_to='uploads/')
+    is_public = models.BooleanField(default=False)

@@ -1,0 +1,187 @@
+{% extends 'dashboard\dashboard.html' %}
+{% load static %}
+
+{% block dashContent %}
+<style>
+  .folder-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 15px;
+  }
+  .folder {
+    width: 150px;
+    height: 150px;
+    background-color: #f1f1f1;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .folder:hover {
+    background-color: #e8e8e8;
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .folder-icon {
+    font-size: 48px;
+    color: #007bff;
+    margin-bottom: 10px;
+  }
+
+  .folder-name {
+    text-align: center;
+    font-weight: 500;
+    font-size: 14px;
+    color: #333;
+  }
+</style>
+<section id="dashboard-filemanager">
+    <div class= "container">
+    <div class="section-title">
+        <h2>File Manager</h2>
+        <h3>Manage your <span>Files</span></h3>
+        <p>Ut possimus qui ut temporibus culpa velit eveniet modi omnis est adipisci expedita at voluptas atque vitae autem.</p>
+    </div>
+    <div class="row d-flex">
+        <div class="col-5">
+            <input type="file" id="fileInput" multiple>
+        </div>
+        <div class = "col-5 ms-auto">
+        <button id="uploadButton" class="btn btn-primary">Upload</button>
+        <button id="createFolderButton" class="btn btn-secondary">Create Folder</button>
+        <input type="text" id="newFolderName" placeholder="Enter folder name">
+        </div>
+    </div>
+    <div class="row">
+        <div class= "col-12">
+        <div id="fileList" class="mt-4 folder-container"></div>
+        </div>
+    </div>
+    {% if files %}
+    <div class="row">
+      <div class="col-12">
+          <table class="table table-striped">
+              <thead>
+                  <tr>
+                      <th>File Name</th>
+                      <th>File Type</th>
+                      <th>File Size</th>
+                      <th>Last Modified</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for file in files %}
+                  <tr>
+                      <td><a href="{{file.filepath}}">{{ file.name }}</a></td>
+                      <td>{{ file.type }}</td>
+                      <td>{{ file.size }}</td>
+                      <td>{{ file.last_modified }}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+  </div>
+  {% endif %}
+</div>
+{{ folders|json_script:"folders-data" }}
+</section>
+
+<script>
+   function fetchFolders() {
+    
+    const folders = JSON.parse(document.getElementById('folders-data').textContent);
+    folders.forEach(folder => {
+      const folderElement = document.createElement('div');
+      folderElement.classList.add('folder');
+      
+      const folderIcon = document.createElement('div');
+      folderIcon.classList.add('folder-icon');
+      folderIcon.innerHTML = '&#128193;';
+      
+      const folderName = document.createElement('div');
+      folderName.classList.add('folder-name');
+      const folderLink = document.createElement('a');
+      folderLink.href = `/folder/${folder}/`; // Change this to the correct URL for the folder
+      folderLink.textContent = folder;
+      folderName.appendChild(folderLink);
+      
+      folderElement.appendChild(folderIcon);
+      folderElement.appendChild(folderName);
+      fileList.appendChild(folderElement);
+    });
+  }
+  document.getElementById("createFolderButton").addEventListener("click", async () => {
+    const folderName = document.getElementById("newFolderName").value;
+
+    if (folderName) {
+        var url = "/create_folder/" 
+        fetch(url, {
+            method:"POST",
+            headers: {
+                'Content-Type': 'application/JSON',
+                'X-CSRFToken' : '{{ csrf_token }}',
+            },
+            body:JSON.stringify( {'folderName': folderName }),
+        })
+        .then((response) =>{
+            return response.json()
+        })
+        .then((data) =>{      
+          if (data.status === "success") {
+          alert(data.message);
+          document.getElementById("newFolderName").value = "";
+          window.location.href='/dashboard/dashboard_filemanager/'
+        } else {
+          alert(data.message);
+        }
+        })
+    } else {
+      alert("Please enter a folder name.");
+    }
+  });
+  document.addEventListener('DOMContentLoaded', (event) => {
+    fetchFolders();});
+    document.getElementById("uploadButton").addEventListener("click", async () => {
+    
+      const folderName = document.getElementById("newFolderName").value;
+      const files = document.getElementById("fileInput").files;
+  console.log(folderName)
+  console.log(files.length)
+      if (folderName && files.length > 0) {
+          const formData = new FormData();
+          formData.append("folder_name", folderName);
+  
+          for (const file of files) {
+              formData.append("file", file);
+          }
+  
+          const response = await fetch("/upload_file/", {
+              method: "POST",
+              headers: {
+                  "X-CSRFToken": "{{ csrf_token }}",
+              },
+              body: formData,
+          });
+  
+          const data = await response.json();
+  
+          if (data.status === "success") {
+              alert(data.message);
+              document.getElementById("fileInput").value = "";
+          } else {
+              alert(data.message);
+          }
+      } else {
+          alert("Please select a folder and a file.");
+      }
+  });
+</script>
+{% endblock dashContent %}

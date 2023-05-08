@@ -16,6 +16,7 @@ django-bootstrap-datepicker-plus = "*"
 django-bootstrap5 = "*"
 django-bootstrap4 = "*"
 pytz = "*"
+requests = "*"
 
 [dev-packages]
 

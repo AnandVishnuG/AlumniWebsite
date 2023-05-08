@@ -2,133 +2,137 @@
 {% load static %}
 {% block hero %}{% endblock hero %}
 {% block content %}
-<section class="h-100 h-custom" style="padding-top: 100px; background-color: #AC142C;">
+<section class="h-100 h-custom" style="background:#EEE; padding-top=100px;">
     <div class="container py-5 h-100">
-        <div class="row d-flex justify-content-center align-items-center h-100">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body p-4">
-                        <div class="row">
-                            <div class="col-lg-7">
-                                <h5 class="mb-3"><a href="#!" class="text-body"><i class="fas fa-long-arrow-alt-left me-2"></i>Continue shopping</a></h5>
-                                <hr>
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <div>
-                                        <p class="mb-1">Shopping cart</p>
-                                        <p class="mb-0">You have {{cart.count}} items in your cart</p>
-                                    </div>
-                                    <div>
-                                        <p class="mb-0"><span class="text-muted">Sort by:</span> <a href="#!" class="text-body">price <i class="fas fa-angle-down mt-1"></i></a></p>
-                                    </div>
-                                </div>
-                                
-                            <!-- Add a class 'cart-item' to each card and a unique id 'cart-item-1', 'cart-item-2', etc. -->
-                            {% for cartItem in cartItems %}
-                            <div class="card mb-3 cart-item" id="cart-item-1">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <div class="d-flex flex-row align-items-center">
-                                            <img src="{{cartItem.product.product_image.url}}" class="img-fluid rounded-3" alt="Shopping item" style="width: 65px;">
-                                            <div class="ms-3">
-                                                <h5>{{cartItem.product.product_name}}</h5>
-                                                <p class="small mb-0">{{cartItem.product.product_desc}}</p>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex flex-row align-items-center">
-                                            <form action="update_cart_quantity/" method="POST">
-                                            {% csrf_token %}
-                                                <input name="quantity" type="number" value="{{cartItem.quantity}}" min="1" style="width: 50px;">
-                                            </form>
-                                            <h5 class="mb-0 item-price"> ${{cartItem.product.product_price}}</h5>
-                                            <a href="#!" style="color: #AC142C;"><i class="fas fa-trash-alt"></i></a>
-                                        </div>
-                                    </div>    
-                                </div>
-                            </div>            
-                            {% endfor %}  
-                            <div class="col-lg-5">
-                            <div class="card shadow-lg">
-                                <div class="card-body">
-                                <h5>Cart total</h5>
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <p>Subtotal</p>
-                                    <p id="subtotal">$</p>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <p>Shipping</p>
-                                    <p>$50</p>
-                                </div>
-                                <hr>
-                                <div class="d-flex justify-content-between">
-                                    <p>Total</p>
-                                    <h5 id="total">$</h5>
-                                </div>
-                                {% comment %} <a href="{% url 'credit_card' total=0 %}?total_amount={{ total|floatformat:2 }}" id="chec kout-btn" class="btn btn-primary w-100 mt-4" style="background-color: #AC142C; border-color: #AC142C;">Checkout</a> {% endcomment %}
-                                </div>
-                            </div>
-                        </div>
+      <div class="row d-flex justify-content-center align-items-center">
+        <div class="col-12">
+          <div class="card card-registration card-registration-2" style="border-radius: 15px;">
+            <div class="card-body p-0">
+              <div class="row g-0">
+                <div class="col-lg-8">
+                  <div class="p-5">
+                    <div class="d-flex justify-content-between align-items-center mb-5">
+                      <h1 class="fw-bold mb-0 text-black">Shopping Cart</h1>
+                      <h6 class="mb-0 text-muted">{{ cart.count }} items</h6>
                     </div>
+                    <hr class="my-4">
+                    {% for cartItem in cartItems %}
+                    <div class="row mb-4 d-flex justify-content-between align-items-center" id="cartItem_{{cartItem.Id}}">
+                      <div class="col-md-2 col-lg-2 col-xl-2">
+                        <img
+                          src="{{cartItem.product.product_image.url}}"
+                          class="img-fluid rounded-3" alt="Cotton T-shirt">
+                      </div>
+                      <div class="col-md-3 col-lg-3 col-xl-3">
+                        <h6 class="text-muted">{{cartItem.product.product_name}}</h6>
+                        <h6 class="text-black mb-0">{{cartItem.product.product_desc}}</h6>
+                      </div>
+                      <div class="col-md-3 col-lg-3 col-xl-2 d-flex">
+                        {% comment %} <button class="btn btn-link px-2"
+                          onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                          <i class="fas fa-minus"></i>
+                        </button> {% endcomment %}
+                        <input id="form1" min="0" name="quantity" value="{{cartItem.quantity}}" type="number"
+                          class="form-control form-control-sm" onchange="updatePrice({{cartItem.id}}, this.value)" />
+  
+                        {% comment %} <button class="btn btn-link px-2"
+                          onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                          <i class="fas fa-plus"></i>
+                        </button> {% endcomment %}
+                      </div>
+                      <div class="col-md-3 col-lg-2 col-xl-2 offset-lg-1">
+                        <h6 class="mb-0">${{cartItem.product.product_price}}</h6>
+                      </div>
+                      <div class="col-md-1 col-lg-1 col-xl-1 text-end">
+                        <a href="/delete_cart/{{cartItem.id}}" class="text-muted"><i class="fas fa-times"></i></a>
+                      </div>
+                    </div>
+                    {% endfor %}
+                    <hr class="my-4">
+
+                    <div class="pt-5">
+                      <h6 class="mb-0"><a href="/products/" class="text-body"><i
+                            class="fas fa-long-arrow-alt-left me-2"></i>Back to products</a></h6>
+                    </div>
+                  </div>
                 </div>
+                <div class="col-lg-4 bg-grey">
+                  <div class="p-5">
+                    <h3 class="fw-bold mb-5 mt-2 pt-1">Summary</h3>
+                    <hr class="my-4">
+  
+                    <div class="d-flex justify-content-between mb-4">
+                      <h6 class="text-uppercase">items: </h6>
+                      <h5 id="summary_total">${{cart.total}}</h5>
+                    </div>
+  
+                    <h6 class="text-uppercase mb-3">Shipping:</h6>
+  
+                    <div id="summary_shipping" class="mb-4 pb-2">
+                      <select class="select" onchange="updateShipping(this.value)">
+                        <option value="0">Slow-Delivery- $0.00</option>
+                        <option value="5">Standard-Delivery- $5.00</option>
+                        <option value="15">Express-Delivery- $15.00</option>
+                        <option value="100">Premium-Delivery- $100.00</option>
+                      </select>
+                    </div>
+  
+                    <hr class="my-4">
+  
+                    <div class="d-flex justify-content-between mb-5">
+                      <h6 class="text-uppercase">Total price:</h6>
+                      <h5 id="total_price"> ${{cart.total}} </h5>
+                    </div>
+                    <form method="GET" action="/checkout/">
+                    {% comment %} {% csrf_token %} {% endcomment %}
+                    <input type="hidden" name="shipping_cost" id="shipping_cost"
+                           value="0" />
+                    <button type="submit" class="btn btn-dark btn-block btn-lg"
+                      data-mdb-ripple-color="dark">Checkout
+                    </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </div>
-            </div>
+          </div>
         </div>
+      </div>
     </div>
-</section>
-                <script>
-                    {% comment %} $(document).ready(function() {
-                    $('.quantity-input').on('change', function() {
-                        const $item = $(this).closest('.cart-item');
-                        const cartId = $item.attr('id').substring(9); // Remove 'cart-item-' prefix
-                        const itemPrice = parseFloat($item.find('.item-price').text().substring(1));
-                        const quantity = parseInt($(this).val());
-                    
-                        // Update the total price immediately before the AJAX request
-                        updateTotal();
-                    
-                        // Send AJAX request to update cart quantity in the backend
-                        $.ajax({
-                        url: '{% url "update_cart_quantity" %}',
-                        type: 'POST',
-                        data: {
-                            'cart_id': cartId,
-                            'quantity': quantity,
-                            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
-                        },
-                        success: function(response) {
-                            if (response.status === 'success') {
-                            // No need to call updateTotal() here, as it was called before the AJAX request
-                            } else {
-                            // Handle failure case
-                            console.error('Failed to update cart quantity');
-                            }
-                        },
-                        error: function() {
-                            // Handle error case
-                            console.error('Error updating cart quantity');
-                        }
-                        });
-                    });
-                    
-                    function updateTotal() {
-                        let subtotal = 0;
-                    
-                        $('.cart-item').each(function() {
-                        const quantity = parseInt($(this).find('.quantity-input').val());
-                        const itemPrice = parseFloat($(this).find('.item-price').text().substring(1));
-                        subtotal += quantity * itemPrice;
-                        });
-                    
-                        const shipping = 50;
-                        const total = subtotal + shipping;
-                    
-                        $('#subtotal').text(`$${subtotal.toFixed(2)}`);
-                        $('#total').text(`$${total.toFixed(2)}`);
-                    
-                        // Update the "Checkout" button href to include the total amount
-                        $('#checkout-btn').attr('href', `{% url 'credit_card' total=0 %}?total_amount=${total.toFixed(2)}`);
-                    }
-                    });
-                    {% endcomment %}
-                </script>
-{% endblock content %}
+  </section>
+  <script>
+    function updatePrice(itemId, quantity) {
+        const summaryTotalElement = document.getElementById("summary_total");
+        const summaryShippingElement = document.getElementById("summary_shipping").querySelector('select');
+        const summarySelected = summaryShippingElement.options[summaryShippingElement.selectedIndex];
+        const totalPrice = document.getElementById("total_price");
+        
+        //console.log(suma)
+        var cartId = {{cart.id}}
+        var url = "/update_cart/" + cartId
+        
+        fetch(url, {
+            method:"POST",
+            headers: {
+                'Content-Type': 'application/JSON',
+                'X-CSRFToken' : '{{ csrf_token }}',
+            },
+            body:JSON.stringify( {'cartItemId': itemId, 'cartItemQuantity': quantity }),
+        })
+        .then((response) =>{
+            return response.json()            
+        })
+        .then((data) =>{
+            summaryTotalElement.innerHTML = '$' + data.total
+            totalPrice.innerHTML = '$' + (parseFloat(summarySelected.value) + parseFloat(data.total))
+        })
+      }
+      function updateShipping(amount){
+        const summaryTotalElement = document.getElementById("summary_total");
+        const totalPrice = document.getElementById("total_price");
+        const shippingCharge = document.getElementById("shipping_cost");
+        totalPrice.innerHTML = '$' + ( parseFloat({{cart.total}}) + parseFloat(amount))
+        shippingCharge.value = parseFloat(amount)
+      }
+  </script>
+  {% endblock content %}
