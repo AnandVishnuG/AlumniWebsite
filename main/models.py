@@ -159,12 +159,13 @@ class Order(models.Model):
         ('processing', 'Processing'),
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
-        ('cancelled', 'Cancelled')
+        ('cancelled', 'Cancelled'),
+        ('completed', 'Completed'),
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     order_date = models.DateTimeField(auto_now_add=True)
     transaction_id = models.CharField(max_length=200, null = True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, default='pending')
     shipping_address = models.ForeignKey(BillingAddress, blank=True, null=True, on_delete=models.SET_NULL)
     shipping_charge = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     @property

@@ -379,34 +379,56 @@ def proceedToPay(request, form):
     return redirect("/cart/")
 @login_required
 def create_paypal_order(request):
-    form_data = json.loads(request.body)
-    print(form_data)
+    billingAddress = BillingAddress.objects.filter(user= request.user).first()
+    order, isCreated = Order.objects.get_or_create(user=request.user, shipping_address=billingAddress, status="created")
+    cart = Cart.objects.filter(user=request.user, isPaid=False).first()
+    cartItems = CartItem.objects.filter(cart=cart)
+    for item in cartItems:
+        orderItem, isCreated = OrderItem.objects.get_or_create(order=order, 
+                                                                product= item.product, 
+                                                                quantity= item.quantity,
+                                                                price=item.product.product_price,)
+            
     headers = {
         "Content-Type": "application/json",
     }
 
     # Create the order
     payload = {
-        "intent": "CAPTURE",
-        "purchase_units": [
-            {
-                "amount": {
-                    "currency_code": "USD",
-                    "value": "100.00",
-                },
+    "intent": "CAPTURE",
+    "purchase_units": [
+        {
+            "amount": {
+                "currency_code": "USD",
+                "value": f"{order.get_total}",
             },
-        ],
-    }
+            "reference_id": str(order.id),
+            "shipping": {
+                "name": {
+                    "full_name": f"{billingAddress.first_name} {billingAddress.last_name}",
+                },
+                "address": {
+                    "address_line_1": billingAddress.address,
+                    "admin_area_2": billingAddress.city,
+                    "admin_area_1": billingAddress.state,
+                    "postal_code": billingAddress.zip_code,
+                    "country_code": billingAddress.country,
+                }
+            },
+        },
+    ],
+}
+
     response = requests.post(
         f"{settings.PAYPAL_BASE_URL}/v2/checkout/orders",
         headers=headers,
         json=payload,
         auth=(settings.PAYPAL_CLIENT_ID, settings.PAYPAL_APP_SECRET),
     )
-    order = response.json()
-    print(order)
+    orderData = response.json()
+    order.status = orderData["status"].capitalize()
     # Return the order ID to the client
-    return JsonResponse({"id": order["id"]})
+    return JsonResponse({"id": orderData["id"]})
 
 @csrf_exempt
 def capture_paypal_order(request):
@@ -424,7 +446,23 @@ def capture_paypal_order(request):
         auth=(settings.PAYPAL_CLIENT_ID, settings.PAYPAL_APP_SECRET),
     )
     capture_data = response.json()
-    print(capture_data)
+    status = capture_data["status"]
+    print()
+    if status == "COMPLETED":
+        messages.success(request, "Payment was successful!")
+        order = Order.objects.get(id=capture_data["purchase_units"][0]["reference_id"])
+        cart = Cart.objects.filter(user=request.user, isPaid=False).first()
+        
+        order.status = status.capitalize()
+        order.save()
+        cart.isPaid = True
+        cart.save()
+    else:
+        order = Order.objects.filter(id=capture_data["purchase_units"][0]["reference_id"], status="created" ).first()
+        messages.error(request, "Payment failed!")
+        order.status = status.capitalize()
+        order.save()
+        
     # Store payment information such as the transaction ID
 
     # Return the capture data to the client
