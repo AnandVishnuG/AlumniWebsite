@@ -454,6 +454,8 @@ def capture_paypal_order(request):
         cart = Cart.objects.filter(user=request.user, isPaid=False).first()
         
         order.status = status.capitalize()
+        order.transaction_id = capture_data["purchase_units"][0]["payments"]["captures"][0].id;
+            
         order.save()
         cart.isPaid = True
         cart.save()
