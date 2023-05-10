@@ -3,11 +3,11 @@
 {% block title %}Profile{% endblock title %}
 {% block hero %}{% endblock hero %} 
 {% block content %}
-<section style="padding-top: 100px;">
+<section class="container" style="padding-top: 100px;">
         <nav aria-label="Page navigation example">
           <ul id="TogglePagination" class="pagination">
-            <li class="page-item active"><a class="page-link" href="/user_profile/{{request.user.id}}"><i class="bi bi-eye"></i></a></li>
-            <li class="page-item"><a class="page-link" href="/edit_profile/{{request.user.id}}"><i class="bi bi-pen"></i></a></li>
+            <li class="page-item"><a class="btn btn-danger rounded-0 rounded-start" href="/user_profile/{{request.user.id}}"><i class="bi bi-eye"></i></a></li>
+            <li class="page-item active"><a class="btn btn-outline-danger rounded-0 rounded-end" href="/edit_profile/{{request.user.id}}"><i class="bi bi-pen"></i></a></li>
           </ul>
         </nav>
       <div class="row">

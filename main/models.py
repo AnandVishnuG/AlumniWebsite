@@ -43,9 +43,9 @@ class Post(models.Model):
     user = models.ForeignKey(User, related_name="posts", on_delete=models.CASCADE)
     # Types of posts
     choices=(
-                ('posts', 'Posts'),
-                ('events', 'Events'),
-                ('news', 'News'),
+                ('Posts', 'Posts'),
+                ('Events', 'Events'),
+                ('News', 'News'),
             )
     category = models.CharField(max_length=10, choices=choices, default='posts')
     body = RichTextField(blank=True, null=True)

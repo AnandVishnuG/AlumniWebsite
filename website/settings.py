@@ -122,6 +122,7 @@ USE_I18N = True
 USE_TZ = True
 
 LOGIN_URL = "/auth/signin/"
+EMAIL_PRESIDENT = 'anandvishnug1994@gmail.com'
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_FROM = 'cutyan@gmail.com'

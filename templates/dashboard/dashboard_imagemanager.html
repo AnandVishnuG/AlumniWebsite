@@ -81,61 +81,56 @@
         <h3>Manage your <span>Images</span></h3>
         <p>Ut possimus qui ut temporibus culpa velit eveniet modi omnis est adipisci expedita at voluptas atque vitae autem.</p>
     </div>
-    <h1>File Manager</h1>
     <input type="file" id="fileInput" multiple>
     <button id="uploadButton" class="btn btn-primary">Upload</button>
     <button id="createFolderButton" class="btn btn-secondary">Create Folder</button>
     
     <input type="text" id="newFolderName" placeholder="Enter folder name">
-    <div id="fileList" class="mt-4 folder-container">
+    <div id="albumList" class="mt-4 folder-container">
       <div id="imageList" class="mt-4 gallery-container">
       </div>
     </div>
+    <div id="portfolio" class="portfolio">
+    <div class="row portfolio-container">
+      {% for image in images %}
+      <div class="col-lg-4 col-md-6 portfolio-item filter-{{product.product_category}}">
+        <img src="{{image.url}}" class="img-fluid" alt="">
+        <div class="portfolio-info">
+          <h4>{{image.filename}}</h4>
+          <a href="{{image.url}}" data-gallery="portfolioGallery" class="portfolio-lightbox preview-link" title="{{image.filename}}"><i class="bi bi-eye"></i></a>
+          <!--a href="portfolio-details.html" class="details-link" title="More Details"><i class="bx bx-plus"></i></a-->
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
 </section>
-  {{ folders|json_script:"folders-data" }}
-  {{ images|json_script:"images-data" }}
+  {{ albums|json_script:"albums-data" }}
   <script>
-    function fetchImages() {
-      const images = JSON.parse(document.getElementById('images-data').textContent);
-      const imageList = document.getElementById('imageList');
-       console.log(images)
-       console.log(imageList) 
-      images.forEach(image => {
-        const imageElement = document.createElement('div');
-        imageElement.classList.add('image');
-  
-        const img = document.createElement('img');
-        img.src = `/media/Image Manager/${image.folder}/${image.filename}`; // Update the path as needed
-  
-        imageElement.appendChild(img);
-        imageList.appendChild(imageElement);
-      });
-    }
-  
     document.addEventListener('DOMContentLoaded', (event) => {
       fetchFolders();
-      fetchImages();
     });
      function fetchFolders() {
-      const folders = JSON.parse(document.getElementById('folders-data').textContent);
-      folders.forEach(folder => {
-        const folderElement = document.createElement('div');
-        folderElement.classList.add('folder');
+      const albums = JSON.parse(document.getElementById('albums-data').textContent);
+      albums.forEach(album => {
+        const albumElement = document.createElement('div');
+        albumElement.classList.add('folder');
         
-        const folderIcon = document.createElement('div');
-        folderIcon.classList.add('folder-icon');
-        folderIcon.innerHTML = '&#128193;';
+        const albumIcon = document.createElement('div');
+        albumIcon.classList.add('folder-icon');
+        albumIcon.innerHTML = '&#128193;';
         
-        const folderName = document.createElement('div');
-        folderName.classList.add('folder-name');
-        const folderLink = document.createElement('a');
-        folderLink.href = `/folder/${folder}/`; // Change this to the correct URL for the folder
-        folderLink.textContent = folder;
-        folderName.appendChild(folderLink);
+        const albumName = document.createElement('div');
+        albumName.classList.add('folder-name');
+        const albumLink = document.createElement('a');
+        albumLink.href = `/album/${album}/`; // Change this to the correct URL for the folder
+        albumLink.textContent = album;
+        albumName.appendChild(albumLink);
         
-        folderElement.appendChild(folderIcon);
-        folderElement.appendChild(folderName);
-        fileList.appendChild(folderElement);
+        albumElement.appendChild(albumIcon);
+        albumElement.appendChild(albumName);
+        albumList.appendChild(albumElement);
       });
     }
     document.getElementById("createFolderButton").addEventListener("click", async () => {
@@ -169,23 +164,19 @@
         alert("Please enter a folder name.");
       }
     });
-    document.addEventListener('DOMContentLoaded', (event) => {
-      fetchFolders();});
       document.getElementById("uploadButton").addEventListener("click", async () => {
       
         const folderName = document.getElementById("newFolderName").value;
         const files = document.getElementById("fileInput").files;
-    console.log(folderName)
-    console.log(files.length)
         if (folderName && files.length > 0) {
             const formData = new FormData();
-            formData.append("folder_name", folderName);
+            formData.append("album_name", folderName);
     
             for (const file of files) {
                 formData.append("file", file);
             }
     
-            const response = await fetch("/upload_file/", {
+            const response = await fetch("/upload_image/", {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": "{{ csrf_token }}",
@@ -202,7 +193,7 @@
                 alert(data.message);
             }
         } else {
-            alert("Please select a folder and a file.");
+            alert("Please select a folder and an image.");
         }
     });
   </script>

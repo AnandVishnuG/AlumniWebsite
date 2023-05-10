@@ -108,8 +108,8 @@
         <!-- Navbar brand -->
         <a class="navbar-brand mt-2 mt-lg-0 me-auto" href="/"><i class="fas fa-crow fa-xl" ></i></a>
         <ul class="navbar-nav ms-auto ">
-          <li class="nav-item"><a class="nav-link scrollto" href="/posts/">News</a></li>
           {% if request.user.is_authenticated  %}
+          <li class="nav-item"><a class="nav-link scrollto" href="/content/">Content</a></li>
           <li class="nav-item"><a class="nav-link scrollto" href="/alumni_list/">Members</a></li>
           <li class="nav-item"><a class="nav-link scrollto" href="/products/">Products</a></li>
           <li class="nav-item"><a class="nav-link scrollto" href="/polls/">Polls</a></li>
@@ -193,12 +193,6 @@
   <!-- ======= Hero Section ======= -->
   {% block hero %}
   <section id="hero">
-    {% for message in messages %}
-            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
-                <strong> </strong>{{message}}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
-            </div>
-        {% endfor %}
         <div class="hero-container">      
           <h3>Welcome to <strong>Maggotty High School Alumni Association</strong></h3>
           <h2>Connecting Graduates and Celebrating Achievements</h2>
@@ -211,7 +205,15 @@
 
   <main id="main">
     {% comment %} <div class="container"> {% endcomment %}
-    {% block content %}
+    {% block messages %}    
+      {% for message in messages %}
+        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert" style="margin-top:100px;">
+            <strong> </strong>{{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close" ></button>
+        </div>
+      {% endfor %}
+    {% endblock messages %}
+      {% block content %}
         <!-- ======= About Section ======= -->
         <section id="about" class="about">
           <div class="container">
@@ -219,26 +221,28 @@
             <div class="section-title">
               <h2>About</h2>
               <h3>Learn More <span>About Us</span></h3>
-              <p>Ut possimus qui ut temporibus culpa velit eveniet modi omnis est adipisci expedita at voluptas atque vitae autem.</p>
+              <br><br>
             </div>
     
             <div class="row content">
               <div class="col-lg-6">
                 <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-                  magna aliqua.
+                  The Maggotty Alumni Association US Northern Region in the umbrella organization for all alumni activities. 
+                  The association is an extraordinary group dedicated to making the vision of Maggotty High School a reality. 
+                  This vision is an extension of our mission: 
                 </p>
                 <ul>
-                  <li><i class="ri-check-double-line"></i> Ullamco laboris nisi ut aliquip ex ea commodo consequat</li>
-                  <li><i class="ri-check-double-line"></i> Duis aute irure dolor in reprehenderit in voluptate velit</li>
-                  <li><i class="ri-check-double-line"></i> Ullamco laboris nisi ut aliquip ex ea commodo consequat</li>
+                  <li><i class="ri-check-double-line"></i> to support the school and equip it</li>
+                  <li><i class="ri-check-double-line"></i> by extension the students, 
+                    with the highest level of practice skills,</li>
+                  <li><i class="ri-check-double-line"></i> and to instill in them the strong bond between the School and our alumni. </li>
                 </ul>
               </div>
               <div class="col-lg-6 pt-4 pt-lg-0">
                 <p>
-                  Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-                  velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-                  culpa qui officia deserunt mollit anim id est laborum.
+                  Alumni involvement and a commitment to one another have always been and will continue to hallmarks of the Association's work. 
+                  We work to encourage participation, identify opportunities, and recognize outstanding, dedicated commitment and leadership. 
+                  We encourage you to discover why the Maggotty Alumni Association US Northern Region is so special. 
                 </p>
                 <a href="#" class="btn-learn-more">Learn More</a>
               </div>
@@ -253,7 +257,6 @@
         <div class="section-title">
           <h2>Team</h2>
           <h3>Our Hardworking <span>Team</span></h3>
-          <p>Ut possimus qui ut temporibus culpa velit eveniet modi omnis est adipisci expedita at voluptas atque vitae autem.</p>
         </div>
 
         <div class="row">
@@ -270,8 +273,8 @@
                 </div>
               </div>
               <div class="member-info">
-                <h4>Walter White</h4>
-                <span>Chief Executive Officer</span>
+                <h4>HJ</h4>
+                <span>President</span>
               </div>
             </div>
           </div>
@@ -288,8 +291,8 @@
                 </div>
               </div>
               <div class="member-info">
-                <h4>Sarah Jhonson</h4>
-                <span>Product Manager</span>
+                <h4>Elton Hanson</h4>
+                <span>Vice President</span>
               </div>
             </div>
           </div>
@@ -306,8 +309,8 @@
                 </div>
               </div>
               <div class="member-info">
-                <h4>William Anderson</h4>
-                <span>CTO</span>
+                <h4>H.Duhaney</h4>
+                <span>Treasurer</span>
               </div>
             </div>
           </div>
@@ -324,8 +327,25 @@
                 </div>
               </div>
               <div class="member-info">
-                <h4>Amanda Jepson</h4>
-                <span>Accountant</span>
+                <h4>M. S.</h4>
+                <span>P.R</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-md-6 d-flex align-items-stretch">
+            <div class="member">
+              <div class="member-img">
+                <img src="static/assets/img/team/team-4.jpg" class="img-fluid" alt="">
+                <div class="social">
+                  <a href=""><i class="bi bi-twitter"></i></a>
+                  <a href=""><i class="bi bi-facebook"></i></a>
+                  <a href=""><i class="bi bi-instagram"></i></a>
+                  <a href=""><i class="bi bi-linkedin"></i></a>
+                </div>
+              </div>
+              <div class="member-info">
+                <h4>L. P.</h4>
+                <span>Event Planner</span>
               </div>
             </div>
           </div>
@@ -342,11 +362,10 @@
         <div class="section-title">
           <h2>Contact</h2>
           <h3>Contact <span>Us</span></h3>
-          <p>Ut possimus qui ut temporibus culpa velit eveniet modi omnis est adipisci expedita at voluptas atque vitae autem.</p>
         </div>
 
         <div>
-          <iframe style="border:0; width: 100%; height: 270px;" src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12097.433213460943!2d-74.0062269!3d40.7101282!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0xb89d1fe6bc499443!2sDowntown+Conference+Center!5e0!3m2!1smk!2sbg!4v1539943755621" frameborder="0" allowfullscreen></iframe>
+          <iframe style="border:0; width: 100%; height: 270px;" src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15164.050009555078!2d-77.7629903!3d18.163338!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8edbdb3cab9e6b85%3A0x4a7805cd6d5fe375!2sMaggotty%20High%20School!5e0!3m2!1sen!2sus!4v1683688719307!5m2!1sen!2sus" frameborder="0" allowfullscreen></iframe>
         </div>
 
         <div class="row mt-5">
@@ -356,13 +375,13 @@
               <div class="address">
                 <i class="bi bi-geo-alt"></i>
                 <h4>Location:</h4>
-                <p>A108 Adam Street, New York, NY 535022</p>
+                <p>567P+8RJ, Maggotty, Jamaica</p>
               </div>
 
               <div class="email">
                 <i class="bi bi-envelope"></i>
                 <h4>Email:</h4>
-                <p>info@example.com</p>
+                <p>hubiej03@gmail.com</p>
               </div>
 
               <div class="phone">
@@ -377,7 +396,8 @@
 
           <div class="col-lg-8 mt-5 mt-lg-0">
 
-            <form action="forms/contact.php" method="post" role="form" class="php-email-form">
+            <form action="/contact/" method="post" role="form" class="php-email-form">
+              {% csrf_token %}
               <div class="row">
                 <div class="col-md-6 form-group">
                   <input type="text" name="name" class="form-control" id="name" placeholder="Your Name" required>

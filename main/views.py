@@ -14,6 +14,7 @@ from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
+from django.core.mail import send_mail
 from decimal import Decimal
 import pytz
 import json
@@ -22,24 +23,28 @@ import os
 import datetime
 # Groups and Permissions
 @login_required
+@group_required("Admin")
 def addToEditorGroup(request):
     group = Group.objects.get(name="Editor")
     request.user.groups.add(group)
     return HttpResponse("Successfully added!")
 
 @login_required
+@group_required("Admin")
 def removeFromEditorGroup(request):
     group = Group.objects.get(name="Editor")
     request.user.groups.remove(group)
     return HttpResponse("Successfully removed!")
 
 @login_required
+@group_required("Admin")
 def addToAdminGroup(request):
     group = Group.objects.get(name="Admin")
     request.user.groups.add(group)
     return HttpResponse("Successfully added!")
 
 @login_required
+@group_required("Admin")
 def removeFromAdminGroup(request):
     group = Group.objects.get(name="Admin")
     request.user.groups.remove(group)
@@ -65,6 +70,7 @@ def addUser(request):
         user = User.objects.create_user(name, email, password)
         user.save()    
     return HttpResponse("Successfully added!")
+
 @login_required
 @group_required("Admin")
 def deleteUser(request):
@@ -72,15 +78,36 @@ def deleteUser(request):
         name = request.POST["name"]
         user = User.objects.remove(username=name)
     return HttpResponse("Successfully removed!")
+
 # Website general views
 def index(request):
     return render(request, "index.html",{})
 
-def contact(request):
-    return render(request, "contact.html")
+def contactUs(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        try:
+            send_mail(
+                subject,
+                'Name: {}\nEmail: {}\n\n{}'.format(name, email, message),
+                email,
+                [settings.EMAIL_PRESIDENT],
+                fail_silently=False,
+            )
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': 'Failed bro, failed!'})
+    
+    return JsonResponse({'success':True})
+
 
 def about(request):
     return render(request, "about.html")
+
+    
+    
 
 # Display list of Alumni
 @login_required
@@ -155,13 +182,19 @@ class PostCreateView(View):
             new_post = form.save(commit=False)
             new_post.user = request.user
             new_post.save()
+            messages.success(request, "Post successfully created!")
+            return redirect('/content/')
+        else:
+            for field_name, errors in form.errors.items():
+                if errors:
+                    messages.error(f"{field_name} is not valid: {', '.join(errors)}")
         return render(request, 'add_post.html', {'form':form})
 
 class PostEditView(View):
    def get(self, request, pk, *args, **kwargs):
         post = Post.objects.get(pk=pk)
         if post.user !=request.user:
-            return redirect(f'/posts/{pk}')
+            return redirect(f'/content/{pk}')
         form = PostForm(initial=model_to_dict(post))
         print(form.fields['category'])
        
@@ -170,7 +203,7 @@ class PostEditView(View):
    def post(self, request, pk, *args, **kwargs):
         post = Post.objects.get(pk=pk)
         if post.user !=request.user:
-            return redirect(f'/posts/{pk}')
+            return redirect(f'/content/{pk}')
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
             form.save()
@@ -181,10 +214,10 @@ class PostDeleteView(View):
    def get(self, request, pk, *args, **kwargs):
         post = Post.objects.get(pk=pk)
         if post.user !=request.user:
-            return redirect(f'/posts/{pk}')
+            return redirect(f'/content/{pk}')
         post.delete()
         messages.warning(request, "Post deleted successfully!")
-        return redirect('/posts/')
+        return redirect('/content/')
    
 # Poll creation
 class PollCreateView(View):
@@ -454,7 +487,7 @@ def capture_paypal_order(request):
         cart = Cart.objects.filter(user=request.user, isPaid=False).first()
         
         order.status = status.capitalize()
-        order.transaction_id = capture_data["purchase_units"][0]["payments"]["captures"][0].id;
+        order.transaction_id = capture_data["purchase_units"][0]["payments"]["captures"][0]["id"];
             
         order.save()
         cart.isPaid = True
@@ -553,16 +586,33 @@ def displayFolder(request, path):
                         files.append(file_data)
 
     return render(request, "dashboard\dashboard_filemanager.html", {'folders': folders, 'files': files})
+@login_required
+def displayAlbum(request, albumname):
+    images=[]
+    base_path = os.path.join(settings.MEDIA_ROOT, 'Image Manager', request.user.email)
+    album_path= os.path.join(base_path, albumname)
+    if not os.path.isdir(album_path):
+        return redirect(request, "dashboard\dashboard_imagemanager.html", {})
+    for item in os.listdir(album_path):
+        image={
+            "filename":item,
+            "url":settings.MEDIA_URL + album_path[len(settings.MEDIA_ROOT):] + "/" + item,
+        }  
+        images.append(image)  
+    return render(request, "dashboard\dashboard_imagemanager.html", {'images': images})
+
 class ImageListView(View):
     def get(self, request, *args, **kwargs):
         base_path = os.path.join(settings.MEDIA_ROOT, 'Image Manager', request.user.email)
         if not os.path.exists(base_path):
             os.makedirs(base_path)
-        folders = os.listdir(base_path)
+        albums = os.listdir(base_path)
+        # images = { folder:os.listdir(folder) for folder in folders}
+        return render(request, "dashboard\dashboard_imagemanager.html", {'albums':albums} )
+class OrderListView(View):
+    def get(self, request, *args, **kwargs):
         
-        images = { folder:os.listdir(folder) for folder in folders}
-        
-        return render(request, "dashboard\dashboard_imagemanager.html", {'folders':folders} )
+        return render(request, "dashboard\dashboard_orderhistory.html", {} )
 
 @login_required
 def upload_file(request):
@@ -614,3 +664,20 @@ def list_images(request):
                 images.append({'folder': folder, 'filename': filename})
     print(images)
     return JsonResponse({"images": images})
+@login_required
+def upload_image(request):
+    if request.method == 'POST':
+        folder_name = request.POST['album_name']
+        uploaded_files = request.FILES.getlist('image')
+        print(uploaded_files)
+        # You can customize the file storage path based on your requirements
+        base_path = os.path.join(settings.MEDIA_ROOT, 'Image Manager', request.user.email, folder_name)
+        print(base_path)
+        for uploaded_file in uploaded_files:
+            fs = FileSystemStorage(location=base_path)
+            fs.save(uploaded_file.name, uploaded_file)
+
+        response = {"status": "success", "message": f"Image(s) uploaded successfully."}
+        return JsonResponse(response)
+
+    return JsonResponse({"status": "error", "message": "Invalid request method."})

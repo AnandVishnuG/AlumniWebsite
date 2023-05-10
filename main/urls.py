@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     # Navbar navigations
     path("",views.index, name="index"),
-    path("contact/",views.contact, name="contact"),
+    path("contact/",views.contactUs, name="contact"),
     path("about/",views.about, name="about"),
     path("alumni_list/",views.displayAlumni, name="displayAlumni"),
     path("products/",views.ProductListView.as_view(), name="product-list"),
@@ -17,8 +17,8 @@ urlpatterns = [
     path("user_profile/<int:pk>", views.displayUserProfile, name="displayUserProfile"),
     path("edit_profile/<int:pk>", views.editUserProfile, name="editUserProfile"),
     # Posts
-    path("posts/",views.PostListView.as_view(), name="post-list"),
-    path("posts/<int:pk>",views.PostDetailView.as_view(), name="post-detail"),
+    path("content/",views.PostListView.as_view(), name="post-list"),
+    path("content/<int:pk>",views.PostDetailView.as_view(), name="post-detail"),
     path("add_post/",views.PostCreateView.as_view(), name="post-create"),
     path("edit_post/<int:pk>",views.PostEditView.as_view(), name="post-edit"),
     path("delete_post/<int:pk>",views.PostDeleteView.as_view(), name="post-delete"),
@@ -44,9 +44,13 @@ urlpatterns = [
     path("dashboard/dashboard_products_delete/<int:id>", views.product_destroy, name="deleteProduct"),
     path("dashboard/dashboard_filemanager/", views.FileListView.as_view(), name="file-list"),
     path("dashboard/dashboard_imagemanager/", views.ImageListView.as_view(), name="image-list"),
+    path("dashboard/dashboard_orderhistory/", views.OrderListView.as_view(), name="order-list"),
     
     path('list_images/', views.list_images, name='list_images'),
     path('create_folder/', views.create_folder, name='create_folder'),
     path('upload_file/', views.upload_file, name='upload_file'),
     path('folder/<path:path>/', views.displayFolder, name="displayFolder" ),   
+    path('album/<albumname>/', views.displayAlbum, name="displayAlbum" ),   
+    path('upload_image/', views.upload_image, name='upload_image'),
+    
 ]

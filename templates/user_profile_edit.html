@@ -2,23 +2,17 @@
 {% load static %}
 {% block title %}Profile{% endblock title %}
 {% block hero %}
-    {% for message in messages %}
-        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
-            <strong> </strong>{{message}}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
-        </div>
-    {% endfor %}
 {% endblock hero %} 
 {% block content %}
-<section style="padding-top: 100px;">
+<section class="container" style="padding-top: 100px;">
     <form method="POST" enctype="multipart/form-data" >
         {% csrf_token %}
     
         <nav aria-label="Page navigation example">  
           <ul id="TogglePagination" class="pagination">
-            <li class="page-item"><a class="page-link" href="/user_profile/{{request.user.id}}"><i class="bi bi-eye"></i></a></li>
-            <li class="page-item active"><a class="page-link" href="/edit_profile/{{request.user.id}}"><i class="bi bi-pen"></i></a></li>
-            <button type="submit" class="ms-auto btn btn-link" ><i class="bi bi-save"></i></button>
+            <li class="page-item"><a class="btn btn-outline-danger rounded-0 rounded-start" href="/user_profile/{{request.user.id}}"><i class="bi bi-eye"></i></a></li>
+            <li class="page-item active"><a class="btn btn-danger rounded-0 rounded-end" href="/edit_profile/{{request.user.id}}"><i class="bi bi-pen"></i></a></li>
+            <button type="submit" class="ms-auto btn btn-danger" >Save</button>
           </ul>
           
         </nav>

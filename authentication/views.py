@@ -44,7 +44,7 @@ def signup(request):
                                        'uid':urlsafe_base64_encode(force_bytes(user.pk)),
                                        'token':generate_token.make_token(user)
                                    })
-        email_message = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, ['anandvishnug1994@gmail.com'] )
+        email_message = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [settings.EMAIL_PRESIDENT] )
         email_message.send()
         messages.success(request, "Your account is being verified, once activated you will get an email")
         return render(request, "authentication/signin.html")
