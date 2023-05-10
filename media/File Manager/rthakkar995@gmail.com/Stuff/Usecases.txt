@@ -1,0 +1,77 @@
+Usecases
+--------
+>> Publish content  (except Guest)
+>> Schedule publishing of posts (Except Guest)
+>> Manage events, calenders, polls (President, Vice president)
+>> Update in-browser content (except Guest)
+> Resize images (except Guest) 
+>> Publish files & images (except Guest) <<includes>> > Upload files & folders (except Guest)
+>> Create image galleries(except Guest)
+>> Create news, Calendar events, polls, and FAQs (President)
+>> Provide feedback on the website (except Guest)
+> Personalize content (except Guest)
+>> Generate reports( President, Treasurer, Asst. Treasurer) 
+>> Customize checkout (President, Treasurer, Asst. Treasurer)
+>> Add to cart (except Guest)
+>> Make purchase <<extends>> Email da bill (except Guest)
+>> Add a payment method  (except Guest)
+>> Add a billing address (except Guest)
+>> Provide quotes (Treasurer, and Asst. Treasurer)
+>> Get/Send email notification (President, Treasurer, Asst. Treasurer)
+> 
+
+-------------------------------
+> Login to system (Includes)
+
+President
+> Publish & Verify content
+> Manage events, calenders, polls
+> Update in-browser content
+> Upload files & folders
+> Resize images
+> Create image galleries
+> Create news, Calendar events, polls, and FAQs
+> Provide feedback on the website
+
+> Keep tally of visitors
+> Get/Send email notification
+
+Treasurer
+> Update in-browser content
+> Upload files & folders (except Guest)
+> Resize images
+> Create image galleries(except Guest)
+> Provide feedback on the website
+
+> Provide quotes
+> Get/Send email notification
+> Ticket price update
+ 
+Asst. Treasurer
+> Update in-browser content
+> Upload files & folders (except Guest)
+> Resize images
+> Create image galleries(except Guest)
+> Provide feedback on the website
+
+> Ticket price update
+
+Editor
+> Update in-browser content
+> Upload files & folders (except Guest)
+> Resize images
+> Create image galleries(except Guest)
+> Provide feedback on the website
+
+> Approve posts
+> Create events, and polls
+ 
+Member
+> Update in-browser content
+> Upload files & folders (except Guest)
+> Resize images
+> Create image galleries(except Guest)
+> Provide feedback on the website
+
+Guest 
+> View events and website details

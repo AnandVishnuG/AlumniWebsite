@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load group_tags %}
 {% block hero %}{% endblock hero %}
 {% block content %}
     <section id="post-detail" style="padding-top:100px;">
@@ -38,7 +39,7 @@
                         </div>
                         <div class="p-2">
                             <p class="ps-3">{{post.body|safe}}</p>
-                            {% if request.user == post.user %}
+                            {% if request.user == post.user or request.user|has_group:'Admin,Treasurer'%}
                             <hr>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex flex-row text-muted ms-auto"> 
@@ -51,16 +52,54 @@
                     </div>
                 </div>
             </div>
-            {% if request.user.is_authenticated %}
+            
             <div class="row justify-content-center mt-3">
-                <div class=" col-md-5 col-sm-12 border-bottom">
+                <div class=" col-md-5 col-sm-12 col-lg-5 border-bottom">
+                    {% for feedback in feedbacks  %}
+                        <div class="row mt-3"> 
+                            <div class="col d-flex align-items-center border p-3">
+                                {% if feedback.user.profile.avatar  %}
+                                <img src= "{{feedback.user.profile.avatar.url}}" width="50" height="50" class="rounded-circle">
+                                {% else %}
+                                <img src= "{% static 'assets\img\profile\default-profile-photo.jpg' %}" width="50" height="50" class="rounded-circle">
+                                {% endif %}   
+                                <div class="d-flex flex-column mx-3 border-end pe-3"> 
+                                    <span><strong>{{request.user.username}}</strong></span> 
+                                    <small class="text-primary">{{request.user.profile.career_position}}</small> 
+                                </div>                          
+                                        
+                                {{feedback.comment}}
+                                <hr>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% if request.user.is_authenticated %}
+            
+            <div class="row justify-content-center mt-3">
+                <div class=" col-md-5 col-sm-12 col-lg-5 border-bottom">
                     <form method="POST">
                         {% csrf_token %}
-                        {{form}}
+                    <div class="d-flex flex-row align-items-center"> 
+                        {% if request.user.profile.avatar  %}
+                        <img src= "{{request.user.profile.avatar.url}}" width="50" height="50" class="rounded-circle">
+                        {% else %}
+                        <img src= "{% static 'assets\img\profile\default-profile-photo.jpg' %}" width="50" height="50" class="rounded-circle">
+                        {% endif %}   
+                            <div class="d-flex flex-column mx-3"> 
+                                <span><strong>{{request.user.username}}</strong></span> 
+                                <small class="text-primary">{{request.user.profile.career_position}}</small> 
+                            </div>                          
+                                {{form}}
+                                
+                            
+                        </div>
                         <div class="d-grid gap-2">
                             <button class ="btn mt-3 mb-5" style="background: #e43c5c;"> Submit! </button>
                         </div>
                     </form>  
+                    
                 </div>
             </div>
             {% endif %}

@@ -16,12 +16,17 @@ class Profile(models.Model):
     avatar = models.ImageField(upload_to='user/avatar', default="..\static\assets\img\profile\default-profile-photo.jpg")
     bio = models.TextField(max_length= 500, blank = True, default="")
     career_position = models.CharField(max_length=50, null=True, blank= True, default="Student")
+    phone = models.CharField(max_length=10, default="0123456789")
     state = models.CharField(max_length=20, blank= True, null=True)
     country = models.CharField(max_length=20, blank= True, null=True)
     linkedin_url = models.CharField(max_length=255, blank= True, null=True)
     instagram_url = models.CharField(max_length=255, blank= True, null=True)
     twitter_url = models.CharField(max_length=255, blank= True, null=True)
     last_updated = models.DateTimeField(User, auto_now=True)
+    @property 
+    def get_role(self):
+        role = self.user.groups.all().first()
+        return role
     def __str__(self):
         return self.user.email
 # Auto create a profile when a user is created
@@ -52,6 +57,11 @@ class Post(models.Model):
     synopsis = models.CharField(max_length=100, default="Place holder")
     created_at = models.DateTimeField(auto_now_add=True)
     publish_date = models.DateTimeField(default=datetime.now)
+    
+    @property
+    def get_feedback_count(self):
+        feedbacks = Feedback.objects.filter(post=self)
+        return feedbacks.count()
     def __str__(self):
         return (f"{self.user}"
                 f"({self.created_at})"
@@ -93,20 +103,30 @@ class Product(models.Model):
 
 # Poll Model
 class Poll(models.Model):
+    user = models.ForeignKey(User, on_delete= models.CASCADE, null=True)
     question     = models.CharField(max_length=200)
-    publish_date = models.DateField(default=datetime.now) 
+    publish_date = models.DateTimeField(default=datetime.now) 
     
     def __str__(self):
         return self.question
 
-# Poll choices Model
+
 class Poll_choice(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
     choice = models.CharField(max_length=200)
-    vote = models.IntegerField(default=0)
-    
+    @property
+    def get_votes(self):
+        votes = self.vote_set.all()
+        count = votes.count()
+        return count
+    # vote = models.IntegerField(default=0)
+# Poll choices Model
+class Vote(models.Model):
+    pollChoice = models.ForeignKey(Poll_choice, on_delete=models.CASCADE, related_name="vote_set")
+    user = models.ForeignKey(User, on_delete=models.CASCADE)    
     def __str__(self):
         return self.choice
+
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     count = models.IntegerField(default=0)

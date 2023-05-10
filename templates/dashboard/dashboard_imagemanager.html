@@ -79,17 +79,34 @@
     <div class="section-title">
         <h2>Image Manager</h2>
         <h3>Manage your <span>Images</span></h3>
-        <p>Ut possimus qui ut temporibus culpa velit eveniet modi omnis est adipisci expedita at voluptas atque vitae autem.</p>
     </div>
-    <input type="file" id="fileInput" multiple>
-    <button id="uploadButton" class="btn btn-primary">Upload</button>
-    <button id="createFolderButton" class="btn btn-secondary">Create Folder</button>
-    
-    <input type="text" id="newFolderName" placeholder="Enter folder name">
+    {% if uploadVisible %}
+    <div class="row d-flex">
+        <div class="col-5">
+            <input type="file" id="imageInput" multiple>
+        </div>
+        <div class = "col-5 ms-auto">
+        <button id="uploadButton" class="btn btn-primary">Upload</button>
+        <button id="createAlbumButton" class="btn btn-secondary">Create Album</button>
+        <input type="text" id="newAlbumName" placeholder="Enter album name">
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+      <div class=" col-md-5 col-sm-12">
+          <a href="/dashboard/dashboard_imagemanager/" style="border-radius:50px; height:40px; width:40px; background:#e43c5c; font-size: 28px; color: #fff; line-height: 0;" 
+          class="d-flex align-items-center justify-content-center">
+              <i class="bi bi-arrow-left-short"></i>
+          </a>
+      </div>
+  </div>
+   {% endif %}
+  <div class="row">
     <div id="albumList" class="mt-4 folder-container">
       <div id="imageList" class="mt-4 gallery-container">
       </div>
     </div>
+  </div>
     <div id="portfolio" class="portfolio">
     <div class="row portfolio-container">
       {% for image in images %}
@@ -109,9 +126,9 @@
   {{ albums|json_script:"albums-data" }}
   <script>
     document.addEventListener('DOMContentLoaded', (event) => {
-      fetchFolders();
+      fetchAlbums();
     });
-     function fetchFolders() {
+     function fetchAlbums() {
       const albums = JSON.parse(document.getElementById('albums-data').textContent);
       albums.forEach(album => {
         const albumElement = document.createElement('div');
@@ -133,18 +150,18 @@
         albumList.appendChild(albumElement);
       });
     }
-    document.getElementById("createFolderButton").addEventListener("click", async () => {
-      const folderName = document.getElementById("newFolderName").value;
+    document.getElementById("createAlbumButton").addEventListener("click", async () => {
+      const albumName = document.getElementById("newAlbumName").value;
   
-      if (folderName) {
-          var url = "/create_folder/" 
+      if (albumName) {
+          var url = "/create_album/" 
           fetch(url, {
               method:"POST",
               headers: {
                   'Content-Type': 'application/JSON',
                   'X-CSRFToken' : '{{ csrf_token }}',
               },
-              body:JSON.stringify( {'folderName': folderName }),
+              body:JSON.stringify( {'albumName': albumName }),
           })
           .then((response) =>{
               return response.json()
@@ -152,7 +169,7 @@
           .then((data) =>{      
             if (data.status === "success") {
             alert(data.message);
-            document.getElementById("newFolderName").value = "";
+            document.getElementById("newAlbumName").value = "";
             window.location.href='/dashboard/dashboard_imagemanager/'
           } else {
             alert(data.message);
@@ -161,19 +178,19 @@
         //const response = await fetch(`/create_folder/`);
         //const data = await response.json();
       } else {
-        alert("Please enter a folder name.");
+        alert("Please enter an album name.");
       }
     });
       document.getElementById("uploadButton").addEventListener("click", async () => {
       
-        const folderName = document.getElementById("newFolderName").value;
-        const files = document.getElementById("fileInput").files;
-        if (folderName && files.length > 0) {
+        const albumName = document.getElementById("newAlbumName").value;
+        const images = document.getElementById("imageInput").files;
+        if (albumName && images.length > 0) {
             const formData = new FormData();
-            formData.append("album_name", folderName);
+            formData.append("album_name", albumName);
     
-            for (const file of files) {
-                formData.append("file", file);
+            for (const image of images) {
+                formData.append("image", image);
             }
     
             const response = await fetch("/upload_image/", {
@@ -188,12 +205,12 @@
     
             if (data.status === "success") {
                 alert(data.message);
-                document.getElementById("fileInput").value = "";
+                document.getElementById("imageInput").value = "";
             } else {
                 alert(data.message);
             }
         } else {
-            alert("Please select a folder and an image.");
+            alert("Please select an album and an image.");
         }
     });
   </script>

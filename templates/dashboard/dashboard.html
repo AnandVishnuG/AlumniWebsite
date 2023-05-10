@@ -1,40 +1,46 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load group_tags %}
 {% block hero %}
 {% endblock hero %}
 {% block content  %}
 <div style="padding-top: 80px;">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-3 col-xl-2 px-3 bg-dark" id="sidebar">
+            <div class="col-md-3 col-xl-2 px-3 " id="sidebar" style="background-color: #AC142C;">
                 <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
                     <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
                         <span class="fs-5 d-none d-sm-inline">Menu</span>
                     </a>
-                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+                    <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu" >
+                        
+                        {% if request.user|has_group:'Admin' %}
                         <li class="nav-item">
-                            <a href="#" class="nav-link align-middle px-0">
+                            <a href="/dashboard/dashboard_permissions/" class="nav-link align-middle px-0" style="color: #EEE;">
                                 <i class="fa fa-user"></i> <span class="ms-1 d-none d-sm-inline">User Permission</span>
                             </a>
                         </li>
+                        {% endif %}
+                        {% if request.user|has_group:'Admin,Treasurer'  %}
                         <li class="nav-item">
-                            <a href="{% url 'dashboard_product' %}" class="nav-link align-middle px-0">
+                            <a href="{% url 'dashboard_product' %}" class="nav-link align-middle px-0"style="color: #EEE;">
                                 <i class="fa fa-shopping-cart"></i> <span class="ms-1 d-none d-sm-inline">Products</span>
                             </a>
                         </li>
+                        {% endif %}
                         <li class="nav-item">
-                            <a href="/dashboard/dashboard_filemanager/" class="nav-link align-middle px-0">
-                                <i class="fa fa-user"></i> <span class="ms-1 d-none d-sm-inline">File Manager</span>
+                            <a href="/dashboard/dashboard_filemanager/" class="nav-link align-middle px-0"style="color: #EEE;">
+                                <i class="fa fa-file"></i> <span class="ms-1 d-none d-sm-inline">File Manager</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/dashboard/dashboard_imagemanager/" class="nav-link align-middle px-0">
-                                <i class="fa fa-user"></i> <span class="ms-1 d-none d-sm-inline">Image Manager</span>
+                            <a href="/dashboard/dashboard_imagemanager/" class="nav-link align-middle px-0"style="color: #EEE;">
+                                <i class="fa fa-image"></i> <span class="ms-1 d-none d-sm-inline">Image Manager</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="/dashboard/dashboard_orderhistory/" class="nav-link align-middle px-0">
-                                <i class="fa fa-user"></i> <span class="ms-1 d-none d-sm-inline">Order History</span>
+                            <a href="/dashboard/order_history/" class="nav-link align-middle px-0"style="color: #EEE;">
+                                <i class="far fa-file-alt"></i> <span class="ms-1 d-none d-sm-inline">Order History</span>
                             </a>
                         </li>
                     </ul>

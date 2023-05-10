@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}All posts{% endblock title %}
+
+{% block hero %}{% endblock hero %}
+{% block content %}
+<section id="create_poll" style="padding-top:100px;">
+    <div class="container">    
+        <div class="section-title">
+          <h2>All polls</h2>
+          <h3>Cast your <span>Votes</span></h3>
+        </div>
+        <div class="row"> 
+        {% for poll in polls %}
+        <h1>{{ poll.question }}</h1>
+<form method="post" action="/display_poll/">
+    {% csrf_token %}
+    {% for pollChoice in pollChoices %}
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ pollChoice.id }}">
+            <label class="form-check-label" for="choice{{ forloop.counter }}">
+                {{ pollChoice.choice }} -- {{ pollChoice.get_votes}}
+            </label>
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Vote</button>
+</form>
+{% endfor %}
+</div>
+<div  class="row mt-3" >
+    <a class="btn btn-danger" href="/create_poll/"><i class="fa fa-plus"></i></a>
+</div>
+
+</div>
+
+</section>
+{% endblock content%}        

@@ -1,10 +1,62 @@
 {% extends 'dashboard/dashboard.html' %}
 {% load static %}
 {% static 'css/dashboard.css' %}
-{% block hero %}
-
-{% endblock hero %}
+{% block hero %}{% endblock hero %}
 
 {% block table  %}
-
-{% endblock table%}
+<div class="content-wrapper" >
+    <section class="content-header">
+        <div class="container-fluid">
+<div class="card">
+<div class="card-header">
+        <h2 class="card-title">Order History Details</h2>
+</div>
+<div class="card-body">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="rooms">
+            <thead>
+                <th>Order ID</th>
+                <th>Paypal Transaction ID</th>
+                <th>Product Name</th>
+                <th>Product Quantity</th>
+                <th>Product Price</th>
+                <th>Customer Name</th>
+                <th>Order Date</th>
+                <th>Billing Address</th>
+                {% comment %} <th>Product Image</th> {% endcomment %}
+                {% comment %} <th>Action</th> {% endcomment %}
+            <tbody>
+                {% if orderItems %}
+                {% for orderItem in orderItems %}
+                 <tr>
+                    <td>{{ orderItem.id }}</td>
+                    <td>{{ orderItem.order.transaction_id }}</td>
+                    <td>{{ orderItem.product.product_name }}</td>
+                    <td>{{ orderItem.quantity }}</td>
+                    <td>${{ orderItem.price }}</td>
+                    <td>{{ orderItem.order.user.first_name  }} {{ orderItem.order.user.last_name  }}</td>
+                    <td>{{ orderItem.order.order_date }}</td>
+                    <td>{{ orderItem.order.shipping_address.address }}, <br>
+                        {{ orderItem.order.shipping_address.city }}, {{ orderItem.order.shipping_address.state }}-{{ orderItem.order.shipping_address.zip_code }}, <br>
+                        {{ orderItem.order.shipping_address.country }}  </td>
+            
+                    {% comment %} <td><img src="{{ product.product_image.url }}" alt="{{ product.product_name }} style="width: 10px; height: 15px;></td> {% endcomment %}
+                    {% comment %} <td>
+                        <form action="" method="post">
+                            {% csrf_token %}
+                        <button type="submit" class="btn btn-primary" ><a href="/dashboard/dashboard_products_edit/{{product.id}}" style="color: white;">Update</a></button>
+                        </form>
+                    </td>
+                    <td><button type="submit" class="btn btn-danger"><a href="/dashboard/dashboard_products_delete/{{product.id}}" style="color: white;">Delete</a></button></td> {% endcomment %}
+                 </tr>
+                 {% endfor %}
+                 {% endif %}
+           </tbody>
+        </table>
+    </div>
+</div>
+</div>
+        </div>
+    </section>
+</div>
+{% endblock table %}

@@ -4,18 +4,19 @@
 {% block hero %}{% endblock hero %}
 {% block content %}
 {% if request.user.is_authenticated %}
-    <div class = "container" style="padding-top:100px;">
-        <div class="row mt-5">
+<section id="post-add" style="padding-top:100px;">
+    <div class = "container">
+        <div class="section-title">
+            <h2>All contents</h2>
+            <h3>Add <span>Content</span></h3>
+        </div>
+    
+    <div class="row mt-5">
             <div class=" col-md-5 col-sm-12">
                 <a href="/content/" style="border-radius:50px; height:40px; width:40px; background:#e43c5c; font-size: 28px; color: #fff; line-height: 0;" 
                    class="d-flex align-items-center justify-content-center">
                     <i class="bi bi-arrow-left-short"></i>
                 </a>
-            </div>
-        </div>
-        <div class="row justify-content-center mt-3">
-            <div class=" col-md-5 col-sm-12 border-bottom">
-                <h5>Add a post!</h5>
             </div>
         </div>
         <div class="row justify-content-center mt-3">
@@ -33,6 +34,6 @@
             </div>
         </div>
     </div>
-    
+</section>    
 {% endif %}
 {% endblock content %}

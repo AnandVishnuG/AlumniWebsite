@@ -6,15 +6,17 @@ from django.views import View
 from django.utils import timezone
 from django.forms.models import model_to_dict
 from django.forms import HiddenInput, formset_factory
-from .models import Profile, Product, Post, Poll_choice, Cart, CartItem, Order, OrderItem, BillingAddress
-from .forms import PostForm, FeedbackForm, PollForm, PollChoiceForm, PollFormSet, CartForm, CartFormSet, ProductsForm, BillingAddressForm
+from .models import Profile, Product, Post, Poll, Poll_choice, Vote, Cart, CartItem, Order, OrderItem, BillingAddress, Feedback
+from .forms import PostForm, FeedbackForm, PollForm, PollChoiceForm, PollFormSet, CartForm, CartFormSet, ProductsForm, BillingAddressForm, UserForm 
 from .decorators import group_required
-from .mixins import CheckAdminGroupMixin, CheckEditorGroupMixin
+from .mixins import CheckAdminGroupMixin, CheckEditorGroupMixin, CheckTreasurerGroupMixin, CheckAdminOrTreasurerGroupMixin, CheckAdminOrEditorGroupMixin, CheckEditorOrTreasurerGroupMixin
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
 from django.core.mail import send_mail
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
 from decimal import Decimal
 import pytz
 import json
@@ -135,6 +137,9 @@ def editUserProfile(request, pk):
         profile.user.first_name = names[0]
         profile.user.last_name  = " ".join(names[1:])
         profile.user.email = request.POST['email']
+        profile.phone = request.POST['phone']
+        profile.state = request.POST['state']
+        profile.country = request.POST['country']
         profile.linkedin_url = request.POST['linkedin_url']
         profile.instagram_url = request.POST['instagram_url']
         profile.twitter_url = request.POST['twitter_url']
@@ -150,11 +155,6 @@ def editUserProfile(request, pk):
 class PostListView( View ):
    def get(self, request, *args, **kwargs):
         posts = Post.objects.all().order_by("-publish_date").filter(publish_date__lte=timezone.now().astimezone(pytz.utc))
-        print(posts[0].created_at)
-        print(posts[0].publish_date)
-        print(timezone.now().astimezone(pytz.utc))
-        print(len(posts))
-        
         form = PostForm()
         return render(request, 'post_list.html', {'post_list' : posts, 'form':form})
    def post(self, request, *args, **kwargs):
@@ -169,8 +169,19 @@ class PostListView( View ):
 class PostDetailView(View):
     def get(self, request, pk, *args, **kwargs):
         post = Post.objects.get(pk=pk)
+        feedbacks = Feedback.objects.filter(post= post).order_by('-created_at')
         form = FeedbackForm()
-        return render(request, 'post_detail.html',{'post':post, 'form':form})
+        return render(request, 'post_detail.html',{'post':post, 'form':form, 'feedbacks':feedbacks})
+    def post(self, request, pk, *args, **kwargs):
+        post = Post.objects.get(pk=pk)
+        feedbacks = Feedback.objects.filter(post= post)
+        comment = Feedback.objects.create(post=post, user=request.user)
+        form = FeedbackForm(request.POST, instance=comment)
+        if form.is_valid():
+            form.save()
+            form= FeedbackForm()
+            messages.success(request, "Comment posted!")
+        return render(request, 'post_detail.html',{'post':post, 'form':form, 'feedbacks':feedbacks})
     
 class PostCreateView(View): 
    def get(self, request, *args, **kwargs):
@@ -190,10 +201,10 @@ class PostCreateView(View):
                     messages.error(f"{field_name} is not valid: {', '.join(errors)}")
         return render(request, 'add_post.html', {'form':form})
 
-class PostEditView(View):
+class PostEditView(LoginRequiredMixin, View):
    def get(self, request, pk, *args, **kwargs):
         post = Post.objects.get(pk=pk)
-        if post.user !=request.user:
+        if post.user !=request.user and not request.user.groups.filter(name='Admin') and not request.user.groups.filter(name='Editor'):
             return redirect(f'/content/{pk}')
         form = PostForm(initial=model_to_dict(post))
         print(form.fields['category'])
@@ -202,7 +213,7 @@ class PostEditView(View):
         return render(request, 'edit_post.html', {'post':post, 'form':form})
    def post(self, request, pk, *args, **kwargs):
         post = Post.objects.get(pk=pk)
-        if post.user !=request.user:
+        if post.user !=request.user and not request.user.groups.filter(name='Admin') and not request.user.groups.filter(name='Editor'):
             return redirect(f'/content/{pk}')
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
@@ -213,35 +224,78 @@ class PostEditView(View):
 class PostDeleteView(View):
    def get(self, request, pk, *args, **kwargs):
         post = Post.objects.get(pk=pk)
-        if post.user !=request.user:
+        if post.user !=request.user and not request.user.groups.filter(name='Admin') and not request.user.groups.filter(name='Editor'):
             return redirect(f'/content/{pk}')
         post.delete()
         messages.warning(request, "Post deleted successfully!")
         return redirect('/content/')
-   
-# Poll creation
-class PollCreateView(View):
+
+class PollListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        form = PollForm()
-        formset = PollFormSet(queryset=Poll_choice.objects.none())
+        polls = Poll.objects.all()
+        pollChoices = Poll_choice.objects.all()
+        votes = Vote.objects.all()
         
+        return render(request, "display_poll.html", {'polls':polls, 'pollChoices':pollChoices, 'votes':votes})   
+    def post(self, request, *args, **kwargs):
+        polls = Poll.objects.all()
+        pollChoices = Poll_choice.objects.all()
+        if Vote.objects.filter(user=request.user.id, pollChoice = pollChoices.get(id=request.POST["choice"]) ).exists():
+            messages.error(request, "You have already voted for this poll.")
+            return render(request, "display_poll.html", {'polls':polls, 'pollChoices':pollChoices})   
+        vote = Vote.objects.create(pollChoice= pollChoices.get(id=request.POST["choice"]), user=request.user)
+        messages.success(request, "Vote successful!")
+        return render(request, "display_poll.html", {'polls':polls, 'pollChoices':pollChoices})   
+# Poll creation
+class PollCreateView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        # poll = Poll.objects.create(user = request.user )
+        # pollChoices = Poll_choice.objects.create(poll= poll)
+        
+        form = PollForm()
+        formset = PollFormSet()
+        for _, field in form.fields.items():
+            if not field == form.fields["publish_date"]:
+                field.widget.attrs['class'] = 'form-control'
+        
+        form.fields['question'].widget.attrs['placeholder'] = "Enter your question here"    
+        for idx, f in enumerate(formset):
+            for _, field in f.fields.items():
+                field.widget.attrs['class'] = 'form-control'
+            f.fields['choice'].widget.attrs['placeholder'] = f"Choice {idx+1}"    
         return render(request, 'create_poll.html',{'form':form, 'formSet':formset})
     
     def post(self, request, *args, **kwargs):
-        form = PollForm(request.POST)
-        formset = PollFormSet(data=self.request.POST)
+        poll = Poll.objects.create(user = request.user )
+        # pollChoices = Poll_choice.objects.filter(poll= poll)
+        
+        form = PollForm(request.POST, instance=poll)
+        formset = PollFormSet(request.POST)
+        if form.is_valid():
+            pass
+        else:
+            for field in form.fields:
+                errors = form.errors.get(field)
+                if errors:
+                    for error in errors:
+                        print(f"Error for field {field}: {error}")
         if all([form.is_valid(), formset.is_valid()]):
-            poll = form.save()
+            poll = form.save(commit=False)
+            poll.user = request.user
+            poll.save()
             for inline_form in formset:
                 if inline_form.cleaned_data:
                     choice = inline_form.save(commit=False)
                     choice.poll = poll
                     choice.save()
+        else: 
+            print('Messed up')
+                    
         return render(request, 'create_poll.html', {'form':form, 'formSet':formset})
     
 
 # Products/Services
-class ProductListView(View):
+class ProductListView(LoginRequiredMixin, CheckAdminOrTreasurerGroupMixin, View):
     def get(self, request, *args, **kwargs):
         products = Product.objects.all()
         return render(request, 'products.html',{'products':products}) 
@@ -301,7 +355,7 @@ def deleteFromCart(request, pk):
     cart.save()
     return redirect('/cart/')
     
-class CartListView(View):
+class CartListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         cart = Cart.objects.filter(user= request.user, isPaid=False).first()
         if not cart:
@@ -330,7 +384,7 @@ def updateCart(request, pk):
     }
     return JsonResponse(response_data, safe=False)
 
-class CheckoutDetailView(View):
+class CheckoutDetailView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         cart = Cart.objects.filter(user=request.user, isPaid=False).first()
         billingAddress = BillingAddress.objects.filter(user= request.user).first()
@@ -348,23 +402,7 @@ class CheckoutDetailView(View):
         cart = Cart.objects.filter(user=request.user, isPaid=False).first()
         billingAddress = BillingAddress.objects.filter(user= request.user).first()
         saveToDB = request.POST.get("saveToDB")
-        # shipping_charge = Decimal(request.POST.get("shipping_cost"))
-        # order_id = request.session.get('order_id')
-        # try:
-        #     order = Order.objects.get(id=order_id)
-        #     order.shipping_charge = shipping_charge
-        #     order.save()
-        # except Order.DoesNotExist:
-        #     order = Order.objects.create(user=request.user, shipping_address=billingAddress, shipping_charge=shipping_charge)
-        #     request.session['order_id'] = order.id        
-        
         cartItems = CartItem.objects.filter(cart=cart)
-        # for item in cartItems:
-        #     orderItem, isCreated = OrderItem.objects.get_or_create(order=order, 
-        #                                                             product= item.product, 
-        #                                                             quantity= item.quantity,
-        #                                                             price=item.product.product_price, )
-        # If billing address is saved
         form = BillingAddressForm(request.POST, instance=billingAddress) 
         valid= False
         for _, field in form.fields.items():
@@ -507,18 +545,17 @@ def capture_paypal_order(request):
 
 
 
-class DashboardView(View):
+class DashboardView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(request, "dashboard\dashboard.html", {})
-    
-class ProductDetailView(View):
+        
+class ProductDetailView(LoginRequiredMixin, CheckAdminOrTreasurerGroupMixin,View):
     def get(self, request, *args, **kwargs):
         products = Product.objects.all()
         print(products)
         return render(request, 'dashboard\dashboard_product.html',{'products':products})
     
-class ProductEditView(View):
-        
+class ProductEditView(LoginRequiredMixin, CheckAdminOrTreasurerGroupMixin, View):
     def get(self, request, pk, *args, **kwargs):
             products = Product.objects.get(id = pk)
             form = ProductsForm(instance=products)
@@ -533,7 +570,19 @@ class ProductEditView(View):
             else:
                 form = ProductsForm(instance=products)
                 return render(request, 'dashboard/dashboard_product_edit.html', {'form': form, 'products':products})
-            
+@login_required
+@group_required(('Admin', 'Treasurer'))
+def dashboard_product_add(request):
+    if request.method == 'POST':
+        form = ProductsForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('/dashboard/dashboard_products')
+    else:
+        form = ProductsForm()
+    return render(request, 'dashboard/dashboard_product_add.html', {'form': form})            
+@login_required
+@group_required(('Admin', 'Treasurer'))
 def product_destroy(request, id):
          products = Product.objects.get(id=id)
          products.delete()
@@ -546,12 +595,13 @@ class FileListView(View):
             os.makedirs(base_path)
         folders = os.listdir(base_path)
         
-        return render(request, "dashboard\dashboard_filemanager.html", {'folders':folders} )
+        return render(request, "dashboard\dashboard_filemanager.html", {'folders':folders, 'uploadVisible':True} )
 @login_required
 def displayFolder(request, path):
     base_path = os.path.join(settings.MEDIA_ROOT, 'File Manager', request.user.email)
     folders = []
     files = []
+
     if '/folder/' in request.path:
         full_path = os.path.join(base_path, path)
         if os.path.exists(full_path):
@@ -603,12 +653,13 @@ def displayAlbum(request, albumname):
 
 class ImageListView(View):
     def get(self, request, *args, **kwargs):
+        
         base_path = os.path.join(settings.MEDIA_ROOT, 'Image Manager', request.user.email)
         if not os.path.exists(base_path):
             os.makedirs(base_path)
         albums = os.listdir(base_path)
         # images = { folder:os.listdir(folder) for folder in folders}
-        return render(request, "dashboard\dashboard_imagemanager.html", {'albums':albums} )
+        return render(request, "dashboard\dashboard_imagemanager.html", {'albums':albums, 'uploadVisible':True} )
 class OrderListView(View):
     def get(self, request, *args, **kwargs):
         
@@ -642,14 +693,22 @@ def list_folders(request):
 @login_required
 def create_folder(request):
     data=json.loads(request.body)
-    folder_name = data['folderName']
-    folder_path = os.path.join(settings.MEDIA_ROOT , 'File Manager/'+request.user.email+'/'+folder_name)
-    print(folder_path)
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
-        response = {"status": "success", "message": f"Folder '{folder_name}' created successfully."}
+    if request.path == "/create_album/":
+        album_name = data['albumName']
+        album_path = os.path.join(settings.MEDIA_ROOT , 'Image Manager/'+request.user.email+'/'+album_name)
+        if not os.path.exists(album_path):
+            os.makedirs(album_path)
+            response = {"status": "success", "message": f"Album '{album_name}' created successfully."}
+        else:
+            response = {"status": "error", "message": f"Album '{album_name}' already exists."}
     else:
-        response = {"status": "error", "message": f"Folder '{folder_name}' already exists."}
+        folder_name = data['folderName']
+        folder_path = os.path.join(settings.MEDIA_ROOT , 'File Manager/'+request.user.email+'/'+folder_name)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+            response = {"status": "success", "message": f"Folder '{folder_name}' created successfully."}
+        else:
+            response = {"status": "error", "message": f"Folder '{folder_name}' already exists."}
 
     return JsonResponse(response)
 @login_required
@@ -681,3 +740,82 @@ def upload_image(request):
         return JsonResponse(response)
 
     return JsonResponse({"status": "error", "message": "Invalid request method."})
+
+class PermissionsView(LoginRequiredMixin, CheckAdminGroupMixin, View):
+    def get( self, request, *args, **kwargs):
+        users = User.objects.all()
+        profiles = Profile.objects.all()
+    
+        roleVisible = False
+        if request.user.groups.filter(name='Admin'):
+            roleVisible = True
+        return render(request, 'dashboard\dashboard_permissions.html', {'profiles': profiles, 'users': users, 'roleVisible': roleVisible})
+@login_required
+@group_required("Admin")
+def user_destroy(request, id):
+         user = User.objects.get(id=id)
+         user.delete()
+         return redirect('/dashboard_permissions')
+     
+class UserRoleEditView(LoginRequiredMixin, CheckAdminGroupMixin, View):
+    def get(self, request, pk, *args, **kwargs):
+        user = User.objects.get(id=pk)
+        userGroup = user.groups.all().first()
+        groups = Group.objects.all()
+        return render(request, 'dashboard/dashboard_permissions_edit.html', {'user': user, 'groups': groups, 'userGroup':userGroup})
+    def post(self, request, pk, *args, **kwargs):
+        user = User.objects.get(id=pk)
+        userGroup = user.groups.all().first()
+        groups = Group.objects.all()
+        
+        group_name = request.POST.get("group_name")
+        print(group_name)
+        if group_name:
+            if userGroup:
+                messages.success(request, f"Already have a role!")    
+                return render(request, 'dashboard/dashboard_permissions_edit.html', {'groups': groups, 'user': user, 'userGroup':userGroup})
+            group = Group.objects.get(name=group_name)
+            user.groups.add(group)
+            user.save()
+            userGroup = group_name
+            messages.success(request, f"Successfully added the role {group_name} to {user.username}")
+        else:
+            group_remove = user.groups.all().first()
+            user.groups.remove(group_remove)
+            user.save()
+            userGroup = ''
+            messages.success(request, f"Successfully removed the roles of {user.username}")
+        return render(request, 'dashboard/dashboard_permissions_edit.html', {'groups': groups, 'user': user, 'userGroup':userGroup})
+@login_required
+@group_required("Admin")
+def dashboard_permissions_add(request):
+    if request.method == 'POST':
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        email = request.POST['email']
+        user_name = request.POST['username']
+        password =request.POST['password']
+        if User.objects.filter(username=user_name).exists() or User.objects.filter(email=email).exists():
+            messages.error(request, "Username or email already exists!")
+        else:
+            user = User.objects.create(username= user_name, 
+                                    email= email,
+                                    first_name= first_name,
+                                    last_name = last_name,
+                                    password= password)
+            
+            messages.success(request, "User successfully added!");
+            return redirect('/dashboard/dashboard_permissions')
+        
+    return render(request, 'dashboard/dashboard_permissions_add.html', {})
+
+class OrderHistoryView(View):
+    def get( self, request, *args, **kwargs):
+        if request.user.groups.filter(name__in= ('Admin', 'Treasurer')):
+            orders = Order.objects.all()
+            orderItems = OrderItem.objects.all()
+        else:
+            orders = Order.objects.filter(user=request.user)
+            orderItems = OrderItem.objects.filter(order__in=orders)
+        # print(users)
+        return render(request, 'dashboard\dashboard_orderHistory.html', {'orders': orders, 'orderItems' : orderItems})

@@ -47,11 +47,12 @@
                         <div class="container text-center" id="choice_container"style="display:none;">
                         {% for choiceForm in formSet %}
                         <div class = "poll-form">
-                        {{choiceForm}}
+                        {{choiceForm.choice}}
                         </div>
                         {% endfor %}
                     </div>
-                        <div id="btn-form" class="text-end">
+                        <br>
+                        <div id="btn-form" class="text-end mb-5" style="display:none;">
                         <i id="add-form" class="fa fa-plus text-center"style="border-radius: 50px;height: 30px; width: 30px;
                         background: #e43c5c;
                         font-size: 28px;
@@ -61,8 +62,8 @@
                         font-size: 28px;
                         color: #fff;"></i>
                         </div>
-                        <div class="d-grid gap-2">
-                            <button class ="btn mt-3 mb-5" style="background: #e43c5c;"> Submit! </button>
+                        <div  class="d-grid gap-2" >
+                            <button id="btn-submit" class ="btn mt-3 mb-5" style="background: #e43c5c; display:none;"> Submit! </button>
                         </div>
                     </form>
                 </div>

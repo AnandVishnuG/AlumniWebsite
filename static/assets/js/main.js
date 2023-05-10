@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   let pollForm = document.querySelectorAll(".poll-form")
   let container = document.querySelector("#form-container")
-  let btnContainer = document.querySelector("#btn-form")
+  let choiceContainer = document.querySelector("#choice_container")
   let addButton = document.querySelector("#add-form")
   let delButton = document.querySelector("#delete-form")
 
@@ -263,11 +263,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let newForm = pollForm[0].cloneNode(true) //Clone the poll form
     let formRegex = RegExp(`form-(\\d){1}-`,'g') //Regex to find all instances of the form number
-    
+    let formRegex2 = RegExp(`Choice\\s(\\d){1}`,'g')
     formNum++ //Increment the form number
     newForm.innerHTML = newForm.innerHTML.replace(formRegex, `form-${formNum}-`) //Update the new form to have the correct form number
-    container.insertBefore(newForm, btnContainer) //Insert the new form at the end of the list of forms
-
+    newForm.innerHTML = newForm.innerHTML.replace(formRegex2, `Choice ${formNum+1}`)
+    // newForm.placeholder = `Choice ${formNum + 1}`
+    choiceContainer.appendChild(newForm) //Insert the new form at the end of the list of forms
+    
     totalForms.setAttribute('value', `${formNum+1}`) //Increment the number of total forms in the management form
 
   }
@@ -299,11 +301,15 @@ function showElement(elementId) {
   var pdateContainer = document.getElementById('pdate_container');
   var choiceContainer = document.getElementById('choice_container');
   var beforePdateContainer = document.getElementById('step_1')
+  let btnContainer = document.querySelector("#btn-form")
+  let btnSubmit = document.querySelector("#btn-submit")
+  
   // Hide all containers
   questionContainer.style.display = 'none';
   pdateContainer.style.display = 'none';
   choiceContainer.style.display = 'none';
-
+  btnContainer.style.display = 'none';
+  btnSubmit.style.display = 'none';
   // Show the appropriate container
   switch (elementId) {
     case 'question_container':
@@ -311,10 +317,12 @@ function showElement(elementId) {
       break;
     case 'pdate_container':
       pdateContainer.style.display = 'block';
+      btnSubmit.style.display = 'block';
       
       break;
     case 'choice_container':
       choiceContainer.style.display = 'block';
+      btnContainer.style.display = 'block';
       break;
   }
 }

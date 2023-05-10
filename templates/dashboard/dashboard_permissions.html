@@ -1,0 +1,67 @@
+{% extends 'dashboard/dashboard.html' %}
+{% load static %}
+{% static 'css/dashboard.css' %}
+{% block hero %}
+{% endblock hero %}
+{% block messages %}{% endblock messages %}
+{% block table  %}
+<div class="content-wrapper" >
+    <section class="content-header">
+        <div class="container-fluid">
+        
+<div class="card">
+<div class="card-header">
+        <h2 class="card-title">User Details</h2>
+        <div style="margin-left: auto"><a class="btn btn-primary" href="/dashboard/dashboard_permissions_add">Add Users+</a></div>
+</div>
+<div class="card-body">
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="rooms">
+            <thead>
+                <th>User ID</th>
+                <th>School ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Career Position</th>
+                <th>Phone</th>
+                <th>Sate</th>
+                <th>Country</th>
+                {% comment %} <th>Product Image</th> {% endcomment %}
+            <tbody>
+                {% if profiles %}
+                {% for profile in profiles %}
+                 <tr>
+                    <td>{{ profile.user.id }}</td>
+                    <td>{{ profile.school_id }}</td>
+                    <td>{{ profile.user.first_name }}</td>
+                    <td>{{ profile.user.last_name }}</td>
+                    <td>{{ profile.user.email }}</td>
+                    <td>{{ profile.get_role }}</td>
+                    <td>{{ profile.career_position }}</td>
+                    <td>{{ profile.phone }}</td>
+                    <td>{{ profile.state }}</td>
+                    <td>{{ profile.country }}</td>
+                    {% comment %} <td><img src="{{ product.product_image.url }}" alt="{{ product.product_name }} style="width: 10px; height: 15px;></td> {% endcomment %}
+                    <td>
+                        <form action="" method="post">
+                            {% csrf_token %}
+                        <button type="submit" class="btn btn-primary" ><a href="/dashboard/dashboard_permissions_edit/{{profile.user.id}}" style="color: white;">Permissions</a></button>
+                        </form>
+                    </td>
+                    <td><button type="submit" class="btn btn-danger"><a href="/dashboard/dashboard_permissions_delete/{{profile.user.id}}" style="color: white;">Delete</a></button>
+                    </td>
+                 </tr>
+                 {% endfor %}
+                 {% endif %}
+           </tbody>
+        </table>
+    </div>
+</div>
+</div>
+        </div>
+    </section>
+</div>
+{% endblock table %}
+

@@ -1,0 +1,62 @@
+{% extends 'dashboard/dashboard.html' %}
+{% load static %}
+{% static 'css/dashboard.css' %}
+{% block hero %}
+{% endblock hero %}
+{% block content %}
+<div class="content-wrapper" style="padding-top: 50px;">
+    <section class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Add New User</h3>
+                        </div>
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="first_name">First Name</label>
+                                    <input type="text" class="form-control" name="first_name" id="first_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="last_name">Last Name</label>
+                                    <input type="text" class="form-control" name="last_name" id="last_name " required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="text" class="form-control" name="email" id="email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="username">Username</label>
+                                    <input type="text" class="form-control" name="username" id="username" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" class="form-control" name="password" id="password" required>
+                                </div>
+                                {% comment %} <div class="form-group">
+                                    <label for="groups">Group</label>
+                                    <input type="text" class="form-control" name="groups" id="groups" required>
+                                </div> {% endcomment %}
+                                {% comment %} <div class="form-group">
+                                    <label for="product_desc">School ID</label>
+                                    <input type="text" class="form-control" name="product_desc" id="product_desc" rows="3" required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="product_image">Product Image</label>
+                                    <input type="file" class="form-control-file" name="product_image" id="product_image" required>
+                                </div> {% endcomment %}
+                            </div>
+                            <div class="card-footer">
+                                <button type="submit" class="btn btn-primary">Add User</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock content %}

@@ -2,6 +2,7 @@ from django.forms import ModelForm, CharField, Textarea, DateTimeField, IntegerF
 from . models import Post, Feedback, Poll, Poll_choice, Cart, CartItem, Product, BillingAddress
 from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from django.utils import timezone
+from django.contrib.auth.models import User
 import pytz
 # Form to create a post
 class PostForm(ModelForm):
@@ -70,7 +71,7 @@ class PollForm(ModelForm):
 class PollChoiceForm(ModelForm):
     class Meta:
         model = Poll_choice
-        fields = ['choice', 'vote']
+        fields = ['choice']
 
 PollFormSet = modelformset_factory(Poll_choice, fields=("choice",), extra=0, min_num=2, max_num=10)
 
@@ -85,3 +86,7 @@ class BillingAddressForm(ModelForm):
         model = BillingAddress
         fields= ["first_name", "last_name", "email", "company_name", "country", "address","city", "state","zip_code" ]
         # fields = "__all__"
+class UserForm(ModelForm):
+    class Meta:
+        model= User
+        fields = "__all__"

@@ -24,6 +24,7 @@ urlpatterns = [
     path("delete_post/<int:pk>",views.PostDeleteView.as_view(), name="post-delete"),
     
     path("create_poll/",views.PollCreateView.as_view(), name="poll-create"),
+    path("display_poll/",views.PollListView.as_view(), name="poll-list"),
     
     path("add_cart/<int:pk>",views.addToCart, name="addToCart"),
     path("delete_cart/<int:pk>",views.deleteFromCart, name="deleteFromCart"),
@@ -40,14 +41,21 @@ urlpatterns = [
     path("dashboard/", views.DashboardView.as_view(), name="dashboard"),
     path("dashboard/dashboard_products", views.ProductDetailView.as_view(), name="dashboard_product"),
     path("dashboard/dashboard_products_edit/<int:pk>", views.ProductEditView.as_view(), name="product-edit"),
-    # path("dashboard/dashboard_products_update/<int:id>", views.product_update, name="updateProduct"),
+    path('dashboard/dashboard_products_add/', views.dashboard_product_add, name='dashboard_product_add'),
     path("dashboard/dashboard_products_delete/<int:id>", views.product_destroy, name="deleteProduct"),
     path("dashboard/dashboard_filemanager/", views.FileListView.as_view(), name="file-list"),
     path("dashboard/dashboard_imagemanager/", views.ImageListView.as_view(), name="image-list"),
     path("dashboard/dashboard_orderhistory/", views.OrderListView.as_view(), name="order-list"),
     
+    path("dashboard/dashboard_permissions/", views.PermissionsView.as_view(), name="dashboard_permissions"),
+    path('dashboard/dashboard_permissions_add/', views.dashboard_permissions_add, name='dashboard_permissions_add'),
+    path("dashboard/dashboard_permissions_edit/<int:pk>", views.UserRoleEditView.as_view(), name="permissions-edit"),
+    path("dashboard/dashboard_permissions_delete/<int:id>", views.user_destroy, name="deleteUser"),
+    path("dashboard/order_history/", views.OrderHistoryView.as_view(), name="order_history"),   
+    
     path('list_images/', views.list_images, name='list_images'),
     path('create_folder/', views.create_folder, name='create_folder'),
+     path('create_album/', views.create_folder, name='create_folder'),
     path('upload_file/', views.upload_file, name='upload_file'),
     path('folder/<path:path>/', views.displayFolder, name="displayFolder" ),   
     path('album/<albumname>/', views.displayAlbum, name="displayAlbum" ),   
