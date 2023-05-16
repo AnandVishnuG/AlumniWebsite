@@ -295,7 +295,7 @@ class PollCreateView(LoginRequiredMixin, View):
     
 
 # Products/Services
-class ProductListView(LoginRequiredMixin, CheckAdminOrTreasurerGroupMixin, View):
+class ProductListView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         products = Product.objects.all()
         return render(request, 'products.html',{'products':products}) 
