@@ -83,7 +83,7 @@ def handleSignIn(request):
         if user is not None:
             login(request, user)
             messages.success(request, "Successfully logged in!")
-            return redirect("/")
+            return redirect("/dashboard/")
         else:
             messages.error(request, "Invalid credentials!")
             return redirect("/auth/signin/")

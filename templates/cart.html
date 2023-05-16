@@ -2,7 +2,7 @@
 {% load static %}
 {% block hero %}{% endblock hero %}
 {% block content %}
-<section class="h-100 h-custom" style="background:#EEE; padding-top=100px;">
+<section class="h-100 h-custom" style=" padding-top=100px;">
     <div class="container py-5 h-100">
       <div class="row d-flex justify-content-center align-items-center">
         <div class="col-12">
@@ -87,7 +87,7 @@
                     {% comment %} {% csrf_token %} {% endcomment %}
                     <input type="hidden" name="shipping_cost" id="shipping_cost"
                            value="0" />
-                    <button type="submit" class="btn btn-dark btn-block btn-lg"
+                    <button type="submit" class="btn btn-block btn-lg" style="color: #fff; background-color: #8c0404"
                       data-mdb-ripple-color="dark">Checkout
                     </button>
                     </form>

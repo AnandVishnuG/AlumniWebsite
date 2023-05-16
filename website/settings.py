@@ -120,22 +120,27 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
+# Login redirect
 LOGIN_URL = "/auth/signin/"
-EMAIL_PRESIDENT = 'anandvishnug1994@gmail.com'
 
-EMAIL_HOST = 'smtp.gmail.com'
+# PPaypal configuration
+PAYPAL_CLIENT_ID = "ASn3xGYbcNY-eZIKEGp0Yb6hNPk4hfQfKhay-XCMz30vtDqu_74DgkdUvoP2zmc81Ka0Zgg3ieG6mJrP"
+PAYPAL_APP_SECRET = "EIykzTjCF1Tx1q5VqqWZeq-7OzDdA2uMDjAtgeoyk4_y2h7pOmimoDKN3TDbLSuE6AMeNmKfpS6BAoOp"
+PAYPAL_BASE_URL = "https://api-m.sandbox.paypal.com" # or use "https://api-m.paypal.com" for production
+
+# Email from the Website
+EMAIL_PRESIDENT = 'anandvishnug1994@gmail.com'
 EMAIL_FROM = 'cutyan@gmail.com'
 EMAIL_HOST_USER = 'cutyan@gmail.com'
 EMAIL_HOST_PASSWORD = 'ngxvxircodtzuijl'
+
+# GMail mailing configuration
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 PASSWORD_RESET_TIMEOUT = 14400
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
-PAYPAL_CLIENT_ID = "ASn3xGYbcNY-eZIKEGp0Yb6hNPk4hfQfKhay-XCMz30vtDqu_74DgkdUvoP2zmc81Ka0Zgg3ieG6mJrP"
-PAYPAL_APP_SECRET = "EIykzTjCF1Tx1q5VqqWZeq-7OzDdA2uMDjAtgeoyk4_y2h7pOmimoDKN3TDbLSuE6AMeNmKfpS6BAoOp"
-PAYPAL_BASE_URL = "https://api-m.sandbox.paypal.com" # or use "https://api-m.paypal.com" for production
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 

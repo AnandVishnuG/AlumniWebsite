@@ -54,15 +54,15 @@
             <input type="file" id="fileInput" multiple>
         </div>
         <div class = "col-5 ms-auto">
-        <button id="uploadButton" class="btn btn-primary">Upload</button>
-        <button id="createFolderButton" class="btn btn-secondary">Create Folder</button>
+        <button id="uploadButton" class="btn" style="background-color: #8c0404;color: #fff;">Upload</button>
+        <button id="createFolderButton" class="btn" style="background-color: #8c0404;color: #fff;">Create Folder</button>
         <input type="text" id="newFolderName" placeholder="Enter folder name">
         </div>
     </div>
     {% else %}
     <div class="row">
       <div class=" col-md-5 col-sm-12">
-          <a href="/dashboard/dashboard_filemanager/" style="border-radius:50px; height:40px; width:40px; background:#e43c5c; font-size: 28px; color: #fff; line-height: 0;" 
+          <a href="/dashboard/dashboard_filemanager/" style="border-radius:50px; height:40px; width:40px; background:#8c0404; color: #fff; font-size: 28px; color: #fff; line-height: 0;" 
           class="d-flex align-items-center justify-content-center">
               <i class="bi bi-arrow-left-short"></i>
           </a>
@@ -78,7 +78,10 @@
     {% if files %}
     <div class="row">
       <div class="col-12">
-          <table class="table table-striped">
+        <div class="card">
+          <div class="card-body">
+            <div class="table-responsive">
+          <table class="table table-border table-striped">
               <thead>
                   <tr>
                       <th>File Name</th>
@@ -98,6 +101,9 @@
                   {% endfor %}
               </tbody>
           </table>
+        </div>
+        </div>
+        </div>
       </div>
   </div>
   {% endif %}

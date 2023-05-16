@@ -13,7 +13,7 @@
       <div class="col-lg-12 justify-content-center">
     {% if profiles %}
         {% for profile in profiles %}
-        <div class="card mb-3" style="max-width: 540px; position-relative">
+        <div class="card mb-3 mx-auto" style="max-width: 540px; position-relative">
             <div class="row g-0">
               <div class="col-md-4">
                 {% if profile.avatar %}
@@ -39,7 +39,8 @@
           <br/><br/>
         {% endfor %}
     {% endif %}
-{% endblock content %} 
-        </div>
-      </div>
+  </div>
+</div>
 </section>
+    {% endblock content %} 
+        

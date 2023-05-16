@@ -10,9 +10,9 @@
     
         <nav aria-label="Page navigation example">  
           <ul id="TogglePagination" class="pagination">
-            <li class="page-item"><a class="btn btn-outline-danger rounded-0 rounded-start" href="/user_profile/{{request.user.id}}"><i class="bi bi-eye"></i></a></li>
-            <li class="page-item active"><a class="btn btn-danger rounded-0 rounded-end" href="/edit_profile/{{request.user.id}}"><i class="bi bi-pen"></i></a></li>
-            <button type="submit" class="ms-auto btn btn-danger" >Save</button>
+            <li class="page-item"><a class="btn rounded-0 rounded-start"  style="border-color:  #8c0404; color: #8c0404;" href="/user_profile/{{request.user.id}}"><i class="bi bi-eye"></i></a></li>
+            <li class="page-item active"><a class="btn rounded-0 rounded-end" style="background-color:  #8c0404; color: #fff;" href="/edit_profile/{{request.user.id}}"><i class="bi bi-pen"></i></a></li>
+            <button type="submit" class="ms-auto btn" style="background-color:  #8c0404; color: #fff;" >Save</button>
           </ul>
           
         </nav>
@@ -44,15 +44,15 @@
               <ul class="list-group list-group-flush rounded-3">
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                   <label for="linkedin_url" ><i class="fab fa-linkedin fa-lg" style="color: #0077b5;"></i></label>
-                  <input class="text-end form-control" type="text" id="linkedin_url" name="linkedin_url" value="{{profile.linkedin_url}}"></input>
+                  <input class="m-1 text-end form-control" type="text" id="linkedin_url" name="linkedin_url" value="{{profile.linkedin_url}}"></input>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                   <label for="instagram_url" ><i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i></i></label>
-                  <input class="text-end form-control" type="text" id="instagram_url" name="instagram_url" value="{{profile.instagram_url}}"></input>
+                  <input class="m-1 text-end form-control" type="text" id="instagram_url" name="instagram_url" value="{{profile.instagram_url}}"></input>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                   <label for="twitter_url" ><i class="fab fa-twitter fa-lg" style="color: #55acee;"></i></i></i></label>
-                  <input class="text-end form-control" type="text" id="twitter_url" name="twitter_url" value="{{profile.twitter_url}}"></input>
+                  <input class="m-1 text-end form-control" type="text" id="twitter_url" name="twitter_url" value="{{profile.twitter_url}}"></input>
                 </li>
               </ul>
             </div>

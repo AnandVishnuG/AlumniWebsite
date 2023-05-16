@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %} Login {% endblock title %} 
-{% block hero %}
-<section id ="hero" style="height: auto;" style="padding-top:100px;">
+{% block hero %}{% endblock hero %}
+{% block content %}
+<section id ="signin" style="padding-top:100px;">
         <div class="container h-100">
           {% for message in messages %}
           <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert" style="margin-top:100px;">
@@ -40,7 +41,7 @@
                 
       
                         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
-                            <button type="submit" class="btn btn-primary btn-lg">Login</button>
+                            <button type="submit" class="btn  btn-lg" style="background-color: #8c0404; color:#fff;">Login</button>
                         </div>
                         <div class="d-flex justify-content-center mx-4 mb-3 mb-lg-4">
                         New user? <a href="/signup/"> Register </a>
@@ -61,5 +62,5 @@
           </div>
         </div>
       </section>
-      {% endblock hero %}
+      {% endblock content %}
       {% block footer %}{% endblock footer %}

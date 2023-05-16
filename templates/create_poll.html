@@ -12,7 +12,7 @@
         </div>
         
         {% if request.user.is_authenticated %}
-        <div class="container pt-5  mb-5 " style="background:#EEE" >
+        <div class="container pt-5  mb-5 " >
             <div class="row">
                 <div class="c-stepper">
                     <div class="c-stepper__item col-lg-4 col-md-4 col-sm-4" id="step_1" onclick="showElement('question_container')">
@@ -31,7 +31,7 @@
                 </div>        
             </div>    
             <div class="row justify-content-center mt-3">
-                <div class=" col-md-5 col-sm-12 border-bottom">
+                <div class=" col-md-5 col-sm-12 border-bottom" style="border-color: #8c0404;">
                     <form id="form-container" method="POST">
                         {% csrf_token %}
                         {% load bootstrap4 %}
@@ -54,16 +54,16 @@
                         <br>
                         <div id="btn-form" class="text-end mb-5" style="display:none;">
                         <i id="add-form" class="fa fa-plus text-center"style="border-radius: 50px;height: 30px; width: 30px;
-                        background: #e43c5c;
+                        background: #8c0404;
                         font-size: 28px;
                         color: #fff;" ></i>
                         <i id="delete-form" class="fa fa-minus text-center"style="border-radius: 50px;height: 30px;width: 30px;
-                        background: #e43c5c;
+                        background: #8c0404;
                         font-size: 28px;
                         color: #fff;"></i>
                         </div>
                         <div  class="d-grid gap-2" >
-                            <button id="btn-submit" class ="btn mt-3 mb-5" style="background: #e43c5c; display:none;"> Submit! </button>
+                            <button id="btn-submit" class ="btn mt-3 mb-5" style="background: #8c0404; color: #fff; display:none;"> Submit! </button>
                         </div>
                     </form>
                 </div>
