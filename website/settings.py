@@ -124,15 +124,15 @@ USE_TZ = True
 LOGIN_URL = "/auth/signin/"
 
 # PPaypal configuration
-PAYPAL_CLIENT_ID = "ASn3xGYbcNY-eZIKEGp0Yb6hNPk4hfQfKhay-XCMz30vtDqu_74DgkdUvoP2zmc81Ka0Zgg3ieG6mJrP"
-PAYPAL_APP_SECRET = "EIykzTjCF1Tx1q5VqqWZeq-7OzDdA2uMDjAtgeoyk4_y2h7pOmimoDKN3TDbLSuE6AMeNmKfpS6BAoOp"
+PAYPAL_CLIENT_ID = "PAYPAL_CLIENT"
+PAYPAL_APP_SECRET = "PAYPAL_SECRET"
 PAYPAL_BASE_URL = "https://api-m.sandbox.paypal.com" # or use "https://api-m.paypal.com" for production
 
 # Email from the Website
 EMAIL_PRESIDENT = 'anandvishnug1994@gmail.com'
 EMAIL_FROM = 'cutyan@gmail.com'
 EMAIL_HOST_USER = 'cutyan@gmail.com'
-EMAIL_HOST_PASSWORD = 'ngxvxircodtzuijl'
+EMAIL_HOST_PASSWORD = 'APPPASSWORD'
 
 # GMail mailing configuration
 EMAIL_HOST = 'smtp.gmail.com'
